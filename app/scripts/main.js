@@ -11,7 +11,8 @@ var dataset = [
 // Set chart dimensions, radius of chart based on smaller of two dimensions
 var width = 360,
     height = 360,
-    radius = Math.min(width, height) / 2;
+    radius = Math.min(width, height) / 2,
+    donutWidth = radius / 2.4;
 
 // Set color scale from D3
 var color = d3.scale.category20b();
@@ -29,6 +30,7 @@ var svg = d3.select('#chart') // get DOM element with chart ID
 // to define the chart's outer radius
 var arc = d3.svg
             .arc()
+            .innerRadius(radius - donutWidth)
             .outerRadius(radius);
 
 // starting and ending angles of the segments - function to be called later
