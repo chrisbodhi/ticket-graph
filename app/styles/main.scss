@@ -51,6 +51,10 @@ body {
 .jumbotron {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
+  h1 {
+    font-size: 22px;
+    text-align: center;
+  }
   .btn {
     font-size: 21px;
     padding: 14px 24px;
@@ -61,7 +65,8 @@ body {
 // Graph-chart bizness start
 /////////////////////////////////////////////////////////////////////////////// 
 #chart {                                                          
-  height: 360px;                                                  
+  height: 360px;
+  margin: 0 auto;                                                  
   position: relative;                                             
   width: 360px;                                                   
 }                                                                 
@@ -87,7 +92,11 @@ body {
   font-size: 12px;
 }
 rect {
+  cursor: pointer;
   stroke-width: 2;
+  &.disabled {
+    fill: transparent !important;
+  }
 }
 /////////////////////////////////////////////////////////////////////////////// 
 // chart bizness end
