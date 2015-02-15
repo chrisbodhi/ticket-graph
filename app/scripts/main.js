@@ -125,7 +125,6 @@ d3.csv(url, function(error, dataset){
             rect.attr('class', 'disabled');
             enabled = false;
           }
-          console.log(rect.attr('class'));
 
           pie.value(function(d) {
             if (d.label === label) d.enabled = enabled;

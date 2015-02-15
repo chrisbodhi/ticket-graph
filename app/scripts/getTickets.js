@@ -1,15 +1,24 @@
+/* global SW:true */  
+
 $(document).ready(function(){
+  'use strict';
+  console.log( 'Doing SW things!' );
   var card = new SW.Card();
-  var tix = card.services('helpdesk');
-  tix.request('tickets')
+  var helpdesk = card.services('helpdesk');
+  helpdesk
+    .request('tickets')
     .then( function(data){
+      console.log( 'got data!' );
+      var ticketCount = {};
       $.each(data.tickets, function(index, ticket){
-        $('body').append('<h4>id: ' + ticket.assignee.id + '</h4>'
-                  + '<h4>name: ' + ticket.assignee.first_name + ' ' 
-                  + ticket.assignee.last_name + '</h4>'
-                  + '<h4>role: ' + ticket.assignee.role + '</h4>'
-                  + '<h4>url: ' + ticket.assignee.url + '</h4>'
-        );
+        console.log( index );
+        if (ticketCount[ticket.assignee.id]){
+          ticketCount[ticket.assignee.id] += 1;
+        } else {
+          ticketCount[ticket.assignee.id] = 1;
+        }
+        console.log( 'ticketCount object' );
+        console.log( ticketCount );
       });
     });
 });
