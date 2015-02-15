@@ -14,6 +14,10 @@ var width = 360,
     radius = Math.min(width, height) / 2,
     donutWidth = radius / 2.4;
 
+// Set legend variables
+var legendRectSize = 18,
+    legendSpacing = 4;
+
 // Set color scale from D3
 var color = d3.scale.category20b();
 // Alternative: Set our own color scale
@@ -40,15 +44,42 @@ var pie = d3.layout.pie()
             .value(function (d) { return d.count; })
             .sort(null);
 
-// create the chart:
-// 
+// create the chart
 var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
               .data(pie(dataset)) // associate dataset with path elements
               .enter() // creates a placeholder node for each dataset value
               .append('path') // replace placeholder with 'path' element
               .attr('d', arc) // define a d attribute for each path element
               .attr('fill', function(d, i){ // use the colorscale to fill each path
-                console.log(i);
+                console.log(d); // 
+                console.log(i); // index of current entry
+                console.log(color);
                 return color(d.data.label);
               });
 
+// define and add the legend for the chart
+var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
+                .data(color.domain()) // call data with arrays of labels from the dataset
+                .enter() // creates the placeholders
+                .append('g') // replace placeholders with the g elements
+                .attr('class', 'legend') // give each g element the legend class
+                .attr('transform', function(d, i){ // centers the legend
+                  var height = legendRectSize + legendSpacing,
+                      offset = height * color.domain().length / 2,
+                      horz = -2 * legendRectSize, // shifts left of center
+                      vert = i * height - offset;
+                  return 'translate(' + horz + ',' + vert + ')';
+                });
+
+// Add the square and label for the legend
+legend.append('rect')
+      .attr('width', legendRectSize)
+      .attr('height', legendRectSize)
+      .style('fill', color) // color('Abulia') returns '#393b79'
+      .style('stroke', color);
+
+// Add the text to the legend
+legend.append('text')
+      .attr('x', legendRectSize + legendSpacing)
+      .attr('y', legendRectSize - legendSpacing)
+      .text(function(d) { return d; });
