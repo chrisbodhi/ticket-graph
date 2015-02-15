@@ -1,0 +1,12 @@
+# Downloaded packages
+node_modules
+bower_components
+
+# Things that are compiled
+dist
+.tmp
+.sass-cache
+
+# Misc
+.DS_Store
+notes.md
