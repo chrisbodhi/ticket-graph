@@ -1,13 +1,6 @@
 /* global d3:true */  
 'use strict';
 
-var dataset = [
-  { label: 'Abulia', count: 10 }, 
-  { label: 'Betelgeuse', count: 20 },
-  { label: 'Cantaloupe', count: 30 },
-  { label: 'Dijkstra', count: 40 }
-];
-
 // Set chart dimensions, radius of chart based on smaller of two dimensions
 var width = 360,
     height = 360,
@@ -44,42 +37,52 @@ var pie = d3.layout.pie()
             .value(function (d) { return d.count; })
             .sort(null);
 
-// create the chart
-var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-              .data(pie(dataset)) // associate dataset with path elements
-              .enter() // creates a placeholder node for each dataset value
-              .append('path') // replace placeholder with 'path' element
-              .attr('d', arc) // define a d attribute for each path element
-              .attr('fill', function(d, i){ // use the colorscale to fill each path
-                console.log(d); // 
-                console.log(i); // index of current entry
-                console.log(color);
-                return color(d.data.label);
-              });
+// load data from a CSV file
+var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv'
 
-// define and add the legend for the chart
-var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
-                .data(color.domain()) // call data with arrays of labels from the dataset
-                .enter() // creates the placeholders
-                .append('g') // replace placeholders with the g elements
-                .attr('class', 'legend') // give each g element the legend class
-                .attr('transform', function(d, i){ // centers the legend
-                  var height = legendRectSize + legendSpacing,
-                      offset = height * color.domain().length / 2,
-                      horz = -2 * legendRectSize, // shifts left of center
-                      vert = i * height - offset;
-                  return 'translate(' + horz + ',' + vert + ')';
+d3.csv(url, function(error, dataset){
+  dataset.forEach(function(d){
+    d.count = +d.count;
+  });
+
+  // create the chart
+  var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
+                .data(pie(dataset)) // associate dataset with path elements
+                .enter() // creates a placeholder node for each dataset value
+                .append('path') // replace placeholder with 'path' element
+                .attr('d', arc) // define a d attribute for each path element
+                .attr('fill', function(d, i){ // use the colorscale to fill each path
+                  console.log(d); // 
+                  console.log(i); // index of current entry
+                  console.log(color);
+                  return color(d.data.label);
                 });
 
-// Add the square and label for the legend
-legend.append('rect')
-      .attr('width', legendRectSize)
-      .attr('height', legendRectSize)
-      .style('fill', color) // color('Abulia') returns '#393b79'
-      .style('stroke', color);
+  // define and add the legend for the chart
+  var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
+                  .data(color.domain()) // call data with arrays of labels from the dataset
+                  .enter() // creates the placeholders
+                  .append('g') // replace placeholders with the g elements
+                  .attr('class', 'legend') // give each g element the legend class
+                  .attr('transform', function(d, i){ // centers the legend
+                    var height = legendRectSize + legendSpacing,
+                        offset = height * color.domain().length / 2,
+                        horz = -2 * legendRectSize, // shifts left of center
+                        vert = i * height - offset;
+                    return 'translate(' + horz + ',' + vert + ')';
+                  });
 
-// Add the text to the legend
-legend.append('text')
-      .attr('x', legendRectSize + legendSpacing)
-      .attr('y', legendRectSize - legendSpacing)
-      .text(function(d) { return d; });
+  // Add the square and label for the legend
+  legend.append('rect')
+        .attr('width', legendRectSize)
+        .attr('height', legendRectSize)
+        .style('fill', color) // color('Abulia') returns '#393b79'
+        .style('stroke', color);
+
+  // Add the text to the legend
+  legend.append('text')
+        .attr('x', legendRectSize + legendSpacing)
+        .attr('y', legendRectSize - legendSpacing)
+        .text(function(d) { return d; });
+
+});
