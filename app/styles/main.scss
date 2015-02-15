@@ -57,12 +57,43 @@ body {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////// 
+// Graph-chart bizness start
+/////////////////////////////////////////////////////////////////////////////// 
+#chart {                                                          
+  height: 360px;                                                  
+  position: relative;                                             
+  width: 360px;                                                   
+}                                                                 
+.d3-tooltip {                                                        
+  background: #eee;                                               
+  box-shadow: 0 0 5px #999999;                                    
+  color: #333;                                                    
+  display: none;                                                  
+  font-size: 12px;                                                
+  left: 140px; // center the tooltip at the middle...
+  padding: 10px;                                                  
+  position: absolute;                                             
+  text-align: center;                                             
+  top: 95px; // ...and top of the donut
+  width: 80px;                                                    
+  z-index: 10;   
+  .label {
+    color: black;
+  }                                                 
+}    
+
 .legend {
   font-size: 12px;
 }
 rect {
   stroke-width: 2;
 }
+/////////////////////////////////////////////////////////////////////////////// 
+// chart bizness end
+/////////////////////////////////////////////////////////////////////////////// 
+
+
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {

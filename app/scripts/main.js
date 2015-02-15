@@ -5,7 +5,7 @@
 var width = 360,
     height = 360,
     radius = Math.min(width, height) / 2,
-    donutWidth = radius / 2.4;
+    donutWidth = 75;
 
 // Set legend variables
 var legendRectSize = 18,
@@ -37,8 +37,23 @@ var pie = d3.layout.pie()
             .value(function (d) { return d.count; })
             .sort(null);
 
+var tooltip = d3.select('#chart')
+                .append('div')
+                .attr('class', 'd3-tooltip');
+
+tooltip.append('div')
+       .attr('class', 'label');
+
+tooltip.append('div')
+       .attr('class', 'count');
+
+tooltip.append('div')
+       .attr('class', 'percent');
+
+tooltip.style('display', 'block');
+
 // load data from a CSV file
-var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv'
+var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
 
 d3.csv(url, function(error, dataset){
   dataset.forEach(function(d){
@@ -52,11 +67,29 @@ d3.csv(url, function(error, dataset){
                 .append('path') // replace placeholder with 'path' element
                 .attr('d', arc) // define a d attribute for each path element
                 .attr('fill', function(d, i){ // use the colorscale to fill each path
-                  console.log(d); // 
-                  console.log(i); // index of current entry
-                  console.log(color);
                   return color(d.data.label);
                 });
+
+  // mouse event handlers for the tooltips
+  path.on('mouseover', function(d){
+    var total = d3.sum(dataset.map(function(d){
+      return d.count;
+    }));
+    var percent = Math.round(1000 * d.data.count / total) / 10;
+    tooltip.select('.label').html(d.data.label);
+    tooltip.select('.count').html(d.data.count);
+    tooltip.select('.percent').html(percent + '%');
+    tooltip.style('display', 'block');
+  });
+  
+  path.on('mouseout', function(d){
+    tooltip.style('display', 'none');
+  });
+
+  // path.on('mousemove', function(d){
+  //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
+  //          .style('left', (d3.event.pageX + 10) + 'px');
+  // });
 
   // define and add the legend for the chart
   var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
