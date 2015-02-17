@@ -1,36 +1,41 @@
 /* global SW:true */  
 
-var getUnassigned = function (assignmentCount) {
-  var ticketTotal = 0;
-  for (var property in assignmentCount) {
-    ticketTotal += assignmentCount[property];
-  }
-  var unassignedTickets = data.tickets.length - ticketTotal;
-  console.log('unassignedTickets');
-  return unassignedTickets;
-}
+var assignedTix = {},
+    tixCount = 0,
+    unassignedTix = [];
 
-var countAssignments = function(ticket){
-  if (assignmentCount[ticket.assignee.id]){
-    assignmentCount[ticket.assignee.id] += 1;
-  } else {
-    assignmentCount[ticket.assignee.id] = 1;
+var appendTicket = function(ticket) {
+  'use strict';
+  if (ticket.status == 'open') {
+    $('.jumbotron').append('<p>' + ticket.id + ' appended for you!</p>');
+    console.log(ticket);
   }
 };
 
-$(document).ready(function(){
+var determineAssignments = function(ticket){
   'use strict';
-  console.log( 'Doing SW things!' );
+  if (assignedTix[ticket.assignee.id]){
+    assignedTix[ticket.assignee.id] += 1;
+  } else if {
+    assignedTix[ticket.assignee.id] = 1;
+  } else {
+    unassignedTix.concat(ticket.id);
+  }
+};
+
+$(document).ready(function() {
+  'use strict';
+  console.log('Doing SW things!');
   var card = new SW.Card();
   var helpdesk = card.services('helpdesk');
-  var assignmentCount = {};
   helpdesk.request('tickets')
-    .then( function(data){
-      $.each(data.tickets, function(index, ticket){
-        countAssignments(ticket);
+    .then(function(data) {
+      tixCount = data.tickets.length;
+      console.log(tixCount);
+      $.each(data.tickets, function(index, ticket) {
+        appendTicket(ticket);
+        determineAssignments(ticket);
       });
-    console.log( assignmentCount + 'final' );
-    getUnassigned(assignmentCount);
     });
-
 });
+
