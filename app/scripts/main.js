@@ -52,6 +52,13 @@ tooltip.append('div')
 
 // load data from a CSV file
 var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
+// var url = 'data.json' // ticket info
+/*
+d3.json(url, function(error, data){
+  // set d.count to total number of tickets per user
+  // set d.label to ticket.assignee.first_name
+});
+*/
 
 d3.csv(url, function(error, dataset){
   dataset.forEach(function(d){
