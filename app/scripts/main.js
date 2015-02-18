@@ -51,20 +51,22 @@ tooltip.append('div')
        .attr('class', 'percent');
 
 // load data from a CSV file
-var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
-// var url = 'data.json' // ticket info
+// var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
+var url = 'scripts/tickets.json'; // ticket info
 /*
 d3.json(url, function(error, data){
   // set d.count to total number of tickets per user
   // set d.label to ticket.assignee.first_name
 });
 */
-
-d3.csv(url, function(error, dataset){
+$.get(url).then(function(dataset){
+  
+// d3.json(data, function(error, dataset){
   dataset.forEach(function(d){
     d.count = +d.count;
     d.enabled = true;
   });
+
 
   // create the chart
   var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
@@ -128,13 +130,13 @@ d3.csv(url, function(error, dataset){
           if (rect.attr('class') === 'disabled') {
             rect.attr('class', '');
           } else {
-            if (totalEnabled < 2) return;
+            if (totalEnabled < 2) {return;}
             rect.attr('class', 'disabled');
             enabled = false;
           }
 
           pie.value(function(d) {
-            if (d.label === label) d.enabled = enabled;
+            if (d.label === label) {d.enabled = enabled;}
             return (d.enabled) ? d.count : 0;
           });
 
