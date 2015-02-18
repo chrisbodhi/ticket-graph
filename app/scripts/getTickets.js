@@ -16,7 +16,7 @@ var determineAssignments = function(ticket){
   'use strict';
   if (assignedTix[ticket.assignee.id]){
     assignedTix[ticket.assignee.id] += 1;
-  } else if {
+  } else if (assignedTix) {
     assignedTix[ticket.assignee.id] = 1;
   } else {
     unassignedTix.concat(ticket.id);
@@ -30,12 +30,14 @@ $(document).ready(function() {
   var helpdesk = card.services('helpdesk');
   helpdesk.request('tickets')
     .then(function(data) {
-      tixCount = data.tickets.length;
-      console.log(tixCount);
-      $.each(data.tickets, function(index, ticket) {
-        appendTicket(ticket);
-        determineAssignments(ticket);
-      });
+      // tixCount = data.tickets.length;
+      console.log(data.tickets);
+      // console.log(tixCount);
+      // $.each(data.tickets, function(index, ticket) {
+      //   appendTicket(ticket);
+        // console.log(ticket);
+      //   determineAssignments(ticket);
+      // });
     });
 });
 
