@@ -11,6 +11,4 @@ dist
 .DS_Store
 notes.md
 1.txt
-app/scripts/dump.js
 app/scripts/info_dump.js
-app/scripts/tickets.json
