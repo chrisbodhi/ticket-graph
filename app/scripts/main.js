@@ -60,103 +60,109 @@ d3.json(url, function(error, data){
 });
 */
 $.get(url).then(function(dataset){
+  $.each(dataset, function(i, d){
+    if (d.assignee){
+      console.log(d.id);
+    }
+  });
+});
   
 // d3.json(data, function(error, dataset){
-  dataset.forEach(function(d){
-    d.count = +d.count;
-    d.enabled = true;
-  });
-
-
-  // create the chart
-  var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-                .data(pie(dataset)) // associate dataset with path elements
-                .enter() // creates a placeholder node for each dataset value
-                .append('path') // replace placeholder with 'path' element
-                .attr('d', arc) // define a d attribute for each path element
-                .attr('fill', function(d, i){ // use the colorscale to fill each path
-                  return color(d.data.label);
-                })
-                .each(function(d){ this._current = d; });
-
-  // mouse event handlers for the tooltips
-  path.on('mouseover', function(d){
-    var total = d3.sum(dataset.map(function(d){
-      return (d.enabled) ? d.count : 0;
-    }));
-    var percent = Math.round(1000 * d.data.count / total) / 10;
-    tooltip.select('.label').html(d.data.label);
-    tooltip.select('.count').html(d.data.count);
-    tooltip.select('.percent').html(percent + '%');
-    tooltip.style('display', 'block');
-  });
-  
-  path.on('mouseout', function(d){
-    tooltip.style('display', 'none');
-  });
-
-  // path.on('mousemove', function(d){
-  //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
-  //          .style('left', (d3.event.pageX + 10) + 'px');
+  // dataset.forEach(function(d){
+  //   d.count = +d.count;
+  //   d.enabled = true;
   // });
 
-  // define and add the legend for the chart
-  var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
-                  .data(color.domain()) // call data with arrays of labels from the dataset
-                  .enter() // creates the placeholders
-                  .append('g') // replace placeholders with the g elements
-                  .attr('class', 'legend') // give each g element the legend class
-                  .attr('transform', function(d, i){ // centers the legend
-                    var height = legendRectSize + legendSpacing,
-                        offset = height * color.domain().length / 2,
-                        horz = -2 * legendRectSize, // shifts left of center
-                        vert = i * height - offset;
-                    return 'translate(' + horz + ',' + vert + ')';
-                  });
 
-  // Add the square and label for the legend
-  legend.append('rect')
-        .attr('width', legendRectSize)
-        .attr('height', legendRectSize)
-        .style('fill', color) // color('Abulia') returns '#393b79'
-        .style('stroke', color)
-        .on('click', function(label) {
-          var rect = d3.select(this);
-          var enabled = true;
-          var totalEnabled = d3.sum(dataset.map(function(d) {
-            return (d.enabled) ? 1 : 0;
-          }));
+  // // create the chart
+  // var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
+  //               .data(pie(dataset)) // associate dataset with path elements
+  //               .enter() // creates a placeholder node for each dataset value
+  //               .append('path') // replace placeholder with 'path' element
+  //               .attr('d', arc) // define a d attribute for each path element
+  //               .attr('fill', function(d, i){ // use the colorscale to fill each path
+  //                 return color(d.data.label);
+  //               })
+  //               .each(function(d){ this._current = d; });
+
+  // // mouse event handlers for the tooltips
+  // path.on('mouseover', function(d){
+  //   var total = d3.sum(dataset.map(function(d){
+  //     return (d.enabled) ? d.count : 0;
+  //   }));
+  //   var percent = Math.round(1000 * d.data.count / total) / 10;
+  //   tooltip.select('.label').html(d.data.label);
+  //   tooltip.select('.count').html(d.data.count);
+  //   tooltip.select('.percent').html(percent + '%');
+  //   tooltip.style('display', 'block');
+  // });
+  
+  // path.on('mouseout', function(d){
+  //   tooltip.style('display', 'none');
+  // });
+
+  // // path.on('mousemove', function(d){
+  // //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
+  // //          .style('left', (d3.event.pageX + 10) + 'px');
+  // // });
+
+  // // define and add the legend for the chart
+  // var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
+  //                 .data(color.domain()) // call data with arrays of labels from the dataset
+  //                 .enter() // creates the placeholders
+  //                 .append('g') // replace placeholders with the g elements
+  //                 .attr('class', 'legend') // give each g element the legend class
+  //                 .attr('transform', function(d, i){ // centers the legend
+  //                   var height = legendRectSize + legendSpacing,
+  //                       offset = height * color.domain().length / 2,
+  //                       horz = -2 * legendRectSize, // shifts left of center
+  //                       vert = i * height - offset;
+  //                   return 'translate(' + horz + ',' + vert + ')';
+  //                 });
+
+  // // Add the square and label for the legend
+  // legend.append('rect')
+  //       .attr('width', legendRectSize)
+  //       .attr('height', legendRectSize)
+  //       .style('fill', color) // color('Abulia') returns '#393b79'
+  //       .style('stroke', color)
+  //       .on('click', function(label) {
+  //         var rect = d3.select(this);
+  //         var enabled = true;
+  //         var totalEnabled = d3.sum(dataset.map(function(d) {
+  //           return (d.enabled) ? 1 : 0;
+  //         }));
           
-          if (rect.attr('class') === 'disabled') {
-            rect.attr('class', '');
-          } else {
-            if (totalEnabled < 2) {return;}
-            rect.attr('class', 'disabled');
-            enabled = false;
-          }
+  //         if (rect.attr('class') === 'disabled') {
+  //           rect.attr('class', '');
+  //         } else {
+  //           if (totalEnabled < 2) {return;}
+  //           rect.attr('class', 'disabled');
+  //           enabled = false;
+  //         }
 
-          pie.value(function(d) {
-            if (d.label === label) {d.enabled = enabled;}
-            return (d.enabled) ? d.count : 0;
-          });
+  //         pie.value(function(d) {
+  //           if (d.label === label) {d.enabled = enabled;}
+  //           return (d.enabled) ? d.count : 0;
+  //         });
 
-          path = path.data(pie(dataset));
+  //         path = path.data(pie(dataset));
 
-          path.transition()
-            .duration(750)
-            .attrTween('d', function(d) {
-              var interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return function(t) {
-                return arc(interpolate(t));
-              };
-            });
-        });
+  //         path.transition()
+  //           .duration(750)
+  //           .attrTween('d', function(d) {
+  //             var interpolate = d3.interpolate(this._current, d);
+  //             this._current = interpolate(0);
+  //             return function(t) {
+  //               return arc(interpolate(t));
+  //             };
+  //           });
+  //       });
 
-  // Add the text to the legend
-  legend.append('text')
-        .attr('x', legendRectSize + legendSpacing)
-        .attr('y', legendRectSize - legendSpacing)
-        .text(function(d) { return d; });
+  // // Add the text to the legend
+  // legend.append('text')
+  //       .attr('x', legendRectSize + legendSpacing)
+  //       .attr('y', legendRectSize - legendSpacing)
+  //       .text(function(d) { return d; });
 
-});
+// });
