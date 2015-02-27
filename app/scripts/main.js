@@ -37,18 +37,26 @@ var pie = d3.layout.pie()
             .value(function (d) { return d.count; })
             .sort(null);
 
-var tooltip = d3.select('#chart')
-                .append('div')
-                .attr('class', 'd3-tooltip');
+// var tooltip = d3.select('#chart')
+//                 .append('div')
+//                 .attr('class', 'd3-tooltip');
 
-tooltip.append('div')
-       .attr('class', 'label');
+// tooltip.append('div')
+//        .attr('class', 'label');
 
-tooltip.append('div')
-       .attr('class', 'count');
+// tooltip.append('div')
+//        .attr('class', 'count');
 
-tooltip.append('div')
-       .attr('class', 'percent');
+// tooltip.append('div')
+//        .attr('class', 'percent');
+
+// $.get(url).then(function(dataset){
+//   $.each(dataset, function(i, d){
+//     if (d.assignee){
+//       console.log(d.assignee.id);
+//     }
+//   });
+// });
 
 // load data from a CSV file
 // var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
@@ -59,54 +67,64 @@ d3.json(url, function(error, data){
   // set d.label to ticket.assignee.first_name
 });
 */
-$.get(url).then(function(dataset){
-  $.each(dataset, function(i, d){
+
+d3.json(url, function(error, dataset){
+  dataset.forEach(function(d){
+    // d.count = +d.count;
+    // d.enabled = true;
     if (d.assignee){
-      console.log(d.id);
+      console.log(d.assignee);
+      // d.users = +d.ticket.assignee.id;
+      // d.count = d.
     }
   });
-});
-  
-// d3.json(data, function(error, dataset){
-  // dataset.forEach(function(d){
-  //   d.count = +d.count;
-  //   d.enabled = true;
-  // });
+
+var assignedTix = {};
+var determineAssignments = function(ticket){
+  'use strict';
+  if (assignedTix[ticket.assignee.id]){
+    assignedTix[ticket.assignee.id] += 1;
+  } else if (assignedTix) {
+    assignedTix[ticket.assignee.id] = 1;
+  } else {
+    unassignedTix.concat(ticket.id);
+  }
+};
 
 
-  // // create the chart
-  // var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-  //               .data(pie(dataset)) // associate dataset with path elements
-  //               .enter() // creates a placeholder node for each dataset value
-  //               .append('path') // replace placeholder with 'path' element
-  //               .attr('d', arc) // define a d attribute for each path element
-  //               .attr('fill', function(d, i){ // use the colorscale to fill each path
-  //                 return color(d.data.label);
-  //               })
-  //               .each(function(d){ this._current = d; });
+  // create the chart
+  var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
+                .data(pie(dataset)) // associate dataset with path elements
+                .enter() // creates a placeholder node for each dataset value
+                .append('path') // replace placeholder with 'path' element
+                .attr('d', arc) // define a d attribute for each path element
+                .attr('fill', function(d, i){ // use the colorscale to fill each path
+                  return color(d.data.label);
+                })
+                .each(function(d){ this._current = d; });
 
-  // // mouse event handlers for the tooltips
+  // mouse event handlers for the tooltips
   // path.on('mouseover', function(d){
   //   var total = d3.sum(dataset.map(function(d){
   //     return (d.enabled) ? d.count : 0;
   //   }));
-  //   var percent = Math.round(1000 * d.data.count / total) / 10;
-  //   tooltip.select('.label').html(d.data.label);
-  //   tooltip.select('.count').html(d.data.count);
-  //   tooltip.select('.percent').html(percent + '%');
-  //   tooltip.style('display', 'block');
+    // var percent = Math.round(1000 * d.data.count / total) / 10;
+    // tooltip.select('.label').html(d.data.label);
+    // tooltip.select('.count').html(d.data.count);
+    // tooltip.select('.percent').html(percent + '%');
+    // tooltip.style('display', 'block');
   // });
   
   // path.on('mouseout', function(d){
   //   tooltip.style('display', 'none');
   // });
 
-  // // path.on('mousemove', function(d){
-  // //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
-  // //          .style('left', (d3.event.pageX + 10) + 'px');
-  // // });
+  // path.on('mousemove', function(d){
+  //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
+  //          .style('left', (d3.event.pageX + 10) + 'px');
+  // });
 
-  // // define and add the legend for the chart
+  // define and add the legend for the chart
   // var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
   //                 .data(color.domain()) // call data with arrays of labels from the dataset
   //                 .enter() // creates the placeholders
@@ -165,4 +183,4 @@ $.get(url).then(function(dataset){
   //       .attr('y', legendRectSize - legendSpacing)
   //       .text(function(d) { return d; });
 
-// });
+});
