@@ -13,9 +13,6 @@ var legendRectSize = 18,
 
 // Set color scale from D3
 var color = d3.scale.category20b();
-// Alternative: Set our own color scale
-// var color = d3.scale.ordinal()
-//               .range(['#hex1'..'#hex5']);
 
 var svg = d3.select('#chart') // get DOM element with chart ID
             .append('svg')    // add an SVG to its end
@@ -50,23 +47,9 @@ var pie = d3.layout.pie()
 // tooltip.append('div')
 //        .attr('class', 'percent');
 
-// $.get(url).then(function(dataset){
-//   $.each(dataset, function(i, d){
-//     if (d.assignee){
-//       console.log(d.assignee.id);
-//     }
-//   });
-// });
 
-// load data from a CSV file
-// var url = 'https://gist.githubusercontent.com/chrisbodhi/1670837485e27e6ec5d7/raw/7c4ab29f18f66ab7a7dd35e2958beba84849bbf3/parkingData.csv';
-var url = 'scripts/tickets.json'; // ticket info
-/*
-d3.json(url, function(error, data){
-  // set d.count to total number of tickets per user
-  // set d.label to ticket.assignee.first_name
-});
-*/
+// ticket info
+var url = 'scripts/tickets.json'; 
 
 var assignedTix = {};
 var determineAssignments = function(ticket){
@@ -82,7 +65,7 @@ var determineAssignments = function(ticket){
   }
 };
 
-// todo: after determineAssignments, get assignee name using 
+// todo: for labels, after determineAssignments, get assignee name using 
 // card.services('environment').request('users')
 //   .then(function(data){
 //     data.users.forEach(function(u){
@@ -112,11 +95,11 @@ d3.json(url, function(error, dataset){
   //   var total = d3.sum(dataset.map(function(d){
   //     return (d.enabled) ? d.count : 0;
   //   }));
-    // var percent = Math.round(1000 * d.data.count / total) / 10;
-    // tooltip.select('.label').html(d.data.label);
-    // tooltip.select('.count').html(d.data.count);
-    // tooltip.select('.percent').html(percent + '%');
-    // tooltip.style('display', 'block');
+  //   var percent = Math.round(1000 * d.data.count / total) / 10;
+  //   tooltip.select('.label').html(d.data.label);
+  //   tooltip.select('.count').html(d.data.count);
+  //   tooltip.select('.percent').html(percent + '%');
+  //   tooltip.style('display', 'block');
   // });
   
   // path.on('mouseout', function(d){
@@ -144,42 +127,42 @@ d3.json(url, function(error, dataset){
 
   // // Add the square and label for the legend
   // legend.append('rect')
-  //       .attr('width', legendRectSize)
-  //       .attr('height', legendRectSize)
-  //       .style('fill', color) // color('Abulia') returns '#393b79'
-  //       .style('stroke', color)
-  //       .on('click', function(label) {
-  //         var rect = d3.select(this);
-  //         var enabled = true;
-  //         var totalEnabled = d3.sum(dataset.map(function(d) {
-  //           return (d.enabled) ? 1 : 0;
-  //         }));
+        .attr('width', legendRectSize)
+        .attr('height', legendRectSize)
+        .style('fill', color) // color('Abulia') returns '#393b79'
+        .style('stroke', color)
+        .on('click', function(label) {
+          var rect = d3.select(this);
+          var enabled = true;
+          var totalEnabled = d3.sum(dataset.map(function(d) {
+            return (d.enabled) ? 1 : 0;
+          }));
           
-  //         if (rect.attr('class') === 'disabled') {
-  //           rect.attr('class', '');
-  //         } else {
-  //           if (totalEnabled < 2) {return;}
-  //           rect.attr('class', 'disabled');
-  //           enabled = false;
-  //         }
+          if (rect.attr('class') === 'disabled') {
+            rect.attr('class', '');
+          } else {
+            if (totalEnabled < 2) {return;}
+            rect.attr('class', 'disabled');
+            enabled = false;
+          }
 
-  //         pie.value(function(d) {
-  //           if (d.label === label) {d.enabled = enabled;}
-  //           return (d.enabled) ? d.count : 0;
-  //         });
+          pie.value(function(d) {
+            if (d.label === label) {d.enabled = enabled;}
+            return (d.enabled) ? d.count : 0;
+          });
 
-  //         path = path.data(pie(dataset));
+          path = path.data(pie(dataset));
 
-  //         path.transition()
-  //           .duration(750)
-  //           .attrTween('d', function(d) {
-  //             var interpolate = d3.interpolate(this._current, d);
-  //             this._current = interpolate(0);
-  //             return function(t) {
-  //               return arc(interpolate(t));
-  //             };
-  //           });
-  //       });
+          path.transition()
+            .duration(750)
+            .attrTween('d', function(d) {
+              var interpolate = d3.interpolate(this._current, d);
+              this._current = interpolate(0);
+              return function(t) {
+                return arc(interpolate(t));
+              };
+            });
+        });
 
   // // Add the text to the legend
   // legend.append('text')
