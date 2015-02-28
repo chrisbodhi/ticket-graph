@@ -68,33 +68,37 @@ d3.json(url, function(error, data){
 });
 */
 
-d3.json(url, function(error, dataset){
-  dataset.forEach(function(d){
-    // d.count = +d.count;
-    // d.enabled = true;
-    if (d.assignee){
-      console.log(d.assignee);
-      // d.users = +d.ticket.assignee.id;
-      // d.count = d.
-    }
-  });
-
 var assignedTix = {};
 var determineAssignments = function(ticket){
   'use strict';
-  if (assignedTix[ticket.assignee.id]){
-    assignedTix[ticket.assignee.id] += 1;
-  } else if (assignedTix) {
-    assignedTix[ticket.assignee.id] = 1;
-  } else {
-    unassignedTix.concat(ticket.id);
+  if (ticket.assignee){
+    if (assignedTix[ticket.assignee.id]){
+      assignedTix[ticket.assignee.id] += 1;
+    } else if (assignedTix) {
+      assignedTix[ticket.assignee.id] = 1;
+    } else {
+      unassignedTix.concat(ticket.id);
+    }
   }
 };
 
+// todo: after determineAssignments, get assignee name using 
+// card.services('environment').request('users')
+//   .then(function(data){
+//     data.users.forEach(function(u){
+//       console.log(u.first_name)
+//     })
+//   });
 
+
+d3.json(url, function(error, dataset){
+  dataset.forEach(function(d){
+    determineAssignments(d);
+  });
+  console.log(assignedTix);
   // create the chart
   var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-                .data(pie(dataset)) // associate dataset with path elements
+                .data(pie(assignedTix)) // associate dataset with path elements
                 .enter() // creates a placeholder node for each dataset value
                 .append('path') // replace placeholder with 'path' element
                 .attr('d', arc) // define a d attribute for each path element
