@@ -50,15 +50,15 @@ tooltip.append('div')
 
 // ticket info
 var url = 'scripts/tickets.json'; 
-
-
-// todo: for labels, after determineAssignments, get assignee name using 
-// card.services('environment').request('users')
-//   .then(function(data){
-//     data.users.forEach(function(u){
-//       console.log(u.first_name)
-//     })
+// tickets pulled from the DB
+// var url = ''
+// var card = new SW.Card();
+// var helpdesk = card.services('helpdesk');
+// helpdesk.request('tickets')
+//   .then(function(data) {
+//     url = data;
 //   });
+
 
 
 d3.json(url, function(error, dataset){
@@ -80,6 +80,29 @@ d3.json(url, function(error, dataset){
   Object.keys(counts).forEach(function(c){
     pieData = pieData.concat({label: c, count: counts[c]});
   });
+
+
+
+  var findById = function(source, id) {
+    return source.filter(function( obj ) {
+      return +obj.id === +id;
+    })[0];
+  };
+    
+
+  // todo: for labels, after building pieData, get assignee name using ID
+  var card = new SW.Card();
+  card.services('environment').request('users')
+    .then(function(data){
+      var indices = Object.keys(pieData).map(function(i){return +i;});
+      indices.forEach(function(i){
+        pieData[i].label = findById(data.users, +pieData[i].label).first_name;
+      });
+    });
+
+  console.log(pieData);
+
+
 
   // create the chart
   var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
@@ -170,6 +193,6 @@ d3.json(url, function(error, dataset){
   legend.append('text')
         .attr('x', legendRectSize + legendSpacing)
         .attr('y', legendRectSize - legendSpacing)
-        .text(function(d) { return d; });
+        .text(function(d) { if (d == 'undefined') {return "Not assigned :'(";} else {return d;} });
 
 });
