@@ -1,15 +1,17 @@
 /* global d3:true */
 /* global SW:true */    
+/* global RSVP:true */    
 'use strict';
-
-// For promises
-var RSVP = require('rsvp');
 
 // Set chart dimensions, radius of chart based on smaller of two dimensions
 var width = 360,
     height = 360,
     radius = Math.min(width, height) / 2,
-    donutWidth = 75;
+    donutWidth = 75,
+    dataHold = [],
+    pieData = [],
+    unassignedTix = [],
+    counts = {};
 
 // Set legend variables
 var legendRectSize = 18,
@@ -54,6 +56,7 @@ tooltip.append('div')
 
 // ticket info
 var url = 'scripts/tickets.json'; 
+
 // tickets pulled from the DB
 // var url = ''
 // var card = new SW.Card();
@@ -63,140 +66,161 @@ var url = 'scripts/tickets.json';
 //     url = data;
 //   });
 
+var prepData = function(dataset){
+  var promise = new RSVP.Promise(function(resolve, reject){
+    var ids = dataset.map(function(d){
+      if (d.assignee){
+        return d.assignee.id;
+      } else {
+        unassignedTix = unassignedTix.concat(d);
+      }
+    });
+
+    ids.sort();
+    ids.forEach(function(x) { counts[x] = (counts[x] || 0 ) + 1; });
+
+    Object.keys(counts).forEach(function(c){
+      dataHold = dataHold.concat({label: c, count: counts[c]});
+    });
+    if (dataHold.length > 0) {
+      resolve(dataHold);
+    } else {
+      reject('err');
+    }
+  });
+  return promise;
+};
+
+var findById = function(source, id) {
+  return source.filter(function( obj ) {
+    return +obj.id === +id;
+  })[0];
+};
+
+var newLabel = function(i, data){
+  console.log(data.users);
+  if (dataHold[i].label != 'undefined'){
+    var user = findById(data.users, +dataHold[i].label);
+    return user.first_name;
+  } else {
+    return 'undefined';
+  }
+};
+
+// For labels, after dumping into dataHold, get assignee name using ID
+var labelData = function(dataHold, data){
+  var promise = new RSVP.Promise(function(resolve, reject){
+    var indices = Object.keys(dataHold).map(function(i){return +i;});
+    indices.forEach(function(i){
+      pieData = pieData.concat({
+        label: newLabel(i, data),
+        count: +dataHold[i].count 
+      });
+    });
+    if (pieData.length > 0){
+      resolve(pieData);
+    } else {
+      reject('err');
+    }
+  });
+  return promise;
+};
+
+var buildChart = function(url, pieData){
+  var promise = new RSVP.Promise(function(resolve, reject){
+    // create the chart
+    var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
+                  .data(pie(pieData)) // associate dataset with path elements
+                  .enter() // creates a placeholder node for each dataset value
+                  .append('path') // replace placeholder with 'path' element
+                  .attr('d', arc) // define a d attribute for each path element
+                  .attr('fill', function(d, i){ // use the colorscale to fill each path
+                    return color(d.data.label);
+                  })
+                  .each(function(d){ this._current = d; });
+
+    // define and add the legend for the chart
+    var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
+                    .data(color.domain()) // call data with arrays of labels from the dataset
+                    .enter() // creates the placeholders
+                    .append('g') // replace placeholders with the g elements
+                    .attr('class', 'legend') // give each g element the legend class
+                    .attr('transform', function(d, i){ // centers the legend
+                      var height = legendRectSize + legendSpacing,
+                          offset = height * color.domain().length / 2,
+                          horz = -2 * legendRectSize, // shifts left of center
+                          vert = i * height - offset;
+                      return 'translate(' + horz + ',' + vert + ')';
+                    });
+
+    // Add the square and label for the legend
+    legend.append('rect')
+          .attr('width', legendRectSize)
+          .attr('height', legendRectSize)
+          .style('fill', color) // color('Abulia') returns '#393b79'
+          .style('stroke', color)
+          .on('click', function(label) {
+            var rect = d3.select(this);
+            var enabled = true;
+            var totalEnabled = d3.sum(pieData.map(function(d) {
+              return (d.enabled) ? 1 : 0;
+            }));
+            
+            if (rect.attr('class') === 'disabled') {
+              rect.attr('class', '');
+            } else {
+              if (totalEnabled < 2) {return;}
+              rect.attr('class', 'disabled');
+              enabled = false;
+            }
+
+            pie.value(function(d) {
+              if (d.label === label) {d.enabled = enabled;}
+              return (d.enabled) ? d.count : 0;
+            });
+
+            path = path.data(pie(pieData));
+
+            path.transition()
+              .duration(750)
+              .attrTween('d', function(d) {
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  return arc(interpolate(t));
+                };
+              });
+          });
+
+    // Add the text to the legend
+    legend.append('text')
+          .attr('x', legendRectSize + legendSpacing)
+          .attr('y', legendRectSize - legendSpacing)
+          .text(function(d) { 
+            if (d === 'undefined') {
+              return 'Not assigned :\'(';
+            } else {
+              return d;
+            }
+          });
+  });
+  return promise;
+};
+
 
 
 d3.json(url, function(error, dataset){
-  var pieData = [],
-      unassignedTix = [],
-      counts = {};
-
-  var ids = dataset.map(function(d){
-    if (d.assignee){
-      return d.assignee.id;
-    } else {
-      unassignedTix = unassignedTix.concat(d);
-    }
-  });
-
-  ids.sort();
-  ids.forEach(function(x) { counts[x] = (counts[x] || 0 ) + 1; });
-
-  Object.keys(counts).forEach(function(c){
-    pieData = pieData.concat({label: c, count: counts[c]});
-  });
-
-
-
-  var findById = function(source, id) {
-    return source.filter(function( obj ) {
-      return +obj.id === +id;
-    })[0];
-  };
-    
-
-  // todo: for labels, after building pieData, get assignee name using ID
   var card = new SW.Card();
   card.services('environment').request('users')
     .then(function(data){
-      var indices = Object.keys(pieData).map(function(i){return +i;});
-      indices.forEach(function(i){
-        pieData[i].label = findById(data.users, +pieData[i].label).first_name;
+      prepData(dataset).then(function(dataHold){
+        return labelData(dataHold, data);
+      }).then(function(pieData){
+        buildChart(url, pieData);
+      }).catch(function(error){
+        console.log(error);
+        return;
       });
     });
-
-  console.log(pieData);
-
-
-
-  // create the chart
-  var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-                .data(pie(pieData)) // associate dataset with path elements
-                .enter() // creates a placeholder node for each dataset value
-                .append('path') // replace placeholder with 'path' element
-                .attr('d', arc) // define a d attribute for each path element
-                .attr('fill', function(d, i){ // use the colorscale to fill each path
-                  return color(d.data.label);
-                })
-                .each(function(d){ this._current = d; });
-
-  // // mouse event handlers for the tooltips
-  // path.on('mouseover', function(d){
-  //   var total = d3.sum(pieData.map(function(d){
-  //     return (d.enabled) ? d.count : 0;
-  //   }));
-  //   var percent = Math.round(1000 * d.data.count / total) / 10;
-  //   tooltip.select('.label').html(d.data.label);
-  //   tooltip.select('.count').html(d.data.count);
-  //   tooltip.select('.percent').html(percent + '%');
-  //   tooltip.style('display', 'block');
-  // });
-  
-  // path.on('mouseout', function(d){
-  //   tooltip.style('display', 'none');
-  // });
-
-  // path.on('mousemove', function(d){
-  //   tooltip.style('top', (d3.event.pageY + 10) + 'px')
-  //          .style('left', (d3.event.pageX + 10) + 'px');
-  // });
-
-  // define and add the legend for the chart
-  var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
-                  .data(color.domain()) // call data with arrays of labels from the dataset
-                  .enter() // creates the placeholders
-                  .append('g') // replace placeholders with the g elements
-                  .attr('class', 'legend') // give each g element the legend class
-                  .attr('transform', function(d, i){ // centers the legend
-                    var height = legendRectSize + legendSpacing,
-                        offset = height * color.domain().length / 2,
-                        horz = -2 * legendRectSize, // shifts left of center
-                        vert = i * height - offset;
-                    return 'translate(' + horz + ',' + vert + ')';
-                  });
-
-  // Add the square and label for the legend
-  legend.append('rect')
-        .attr('width', legendRectSize)
-        .attr('height', legendRectSize)
-        .style('fill', color) // color('Abulia') returns '#393b79'
-        .style('stroke', color)
-        .on('click', function(label) {
-          var rect = d3.select(this);
-          var enabled = true;
-          var totalEnabled = d3.sum(dataset.map(function(d) {
-            return (d.enabled) ? 1 : 0;
-          }));
-          
-          if (rect.attr('class') === 'disabled') {
-            rect.attr('class', '');
-          } else {
-            if (totalEnabled < 2) {return;}
-            rect.attr('class', 'disabled');
-            enabled = false;
-          }
-
-          pie.value(function(d) {
-            if (d.label === label) {d.enabled = enabled;}
-            return (d.enabled) ? d.count : 0;
-          });
-
-          path = path.data(pie(dataset));
-
-          path.transition()
-            .duration(750)
-            .attrTween('d', function(d) {
-              var interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return function(t) {
-                return arc(interpolate(t));
-              };
-            });
-        });
-
-  // Add the text to the legend
-  legend.append('text')
-        .attr('x', legendRectSize + legendSpacing)
-        .attr('y', legendRectSize - legendSpacing)
-        .text(function(d) { if (d === 'undefined') {return 'Not assigned :\'(';} else {return d;} });
-
 });
+
