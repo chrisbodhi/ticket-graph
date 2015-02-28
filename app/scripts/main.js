@@ -1,5 +1,9 @@
-/* global d3:true */  
+/* global d3:true */
+/* global SW:true */    
 'use strict';
+
+// For promises
+var RSVP = require('rsvp');
 
 // Set chart dimensions, radius of chart based on smaller of two dimensions
 var width = 360,
@@ -193,6 +197,6 @@ d3.json(url, function(error, dataset){
   legend.append('text')
         .attr('x', legendRectSize + legendSpacing)
         .attr('y', legendRectSize - legendSpacing)
-        .text(function(d) { if (d == 'undefined') {return "Not assigned :'(";} else {return d;} });
+        .text(function(d) { if (d === 'undefined') {return 'Not assigned :\'(';} else {return d;} });
 
 });
