@@ -51,19 +51,6 @@ var pie = d3.layout.pie()
 // ticket info
 var url = 'scripts/tickets.json'; 
 
-var assignedTix = {};
-var determineAssignments = function(ticket){
-  'use strict';
-  if (ticket.assignee){
-    if (assignedTix[ticket.assignee.id]){
-      assignedTix[ticket.assignee.id] += 1;
-    } else if (assignedTix) {
-      assignedTix[ticket.assignee.id] = 1;
-    } else {
-      unassignedTix.concat(ticket.id);
-    }
-  }
-};
 
 // todo: for labels, after determineAssignments, get assignee name using 
 // card.services('environment').request('users')
@@ -75,13 +62,36 @@ var determineAssignments = function(ticket){
 
 
 d3.json(url, function(error, dataset){
-  dataset.forEach(function(d){
-    determineAssignments(d);
+  var pieData = [],
+      unassignedTix = [],
+      counts = {};
+
+
+
+  var ids = dataset.map(function(d){
+    if (d.assignee){
+      return d.assignee.id;
+    } else {
+      unassignedTix = unassignedTix.concat(d);
+    }
   });
-  console.log(assignedTix);
+
+  ids.sort();
+  ids.forEach(function(x) { counts[x] = (counts[x] || 0 ) + 1; });
+  console.log(counts);
+  console.log(Object.keys(counts));
+
+
+  Object.keys(counts).forEach(function(c){
+    pieData = pieData.concat({label: c, count: counts[c]});
+  });
+
+  console.log(pieData);
+  console.log(unassignedTix.length);
+
   // create the chart
   var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-                .data(pie(assignedTix)) // associate dataset with path elements
+                .data(pie(pieData)) // associate dataset with path elements
                 .enter() // creates a placeholder node for each dataset value
                 .append('path') // replace placeholder with 'path' element
                 .attr('d', arc) // define a d attribute for each path element
@@ -127,42 +137,42 @@ d3.json(url, function(error, dataset){
 
   // // Add the square and label for the legend
   // legend.append('rect')
-        .attr('width', legendRectSize)
-        .attr('height', legendRectSize)
-        .style('fill', color) // color('Abulia') returns '#393b79'
-        .style('stroke', color)
-        .on('click', function(label) {
-          var rect = d3.select(this);
-          var enabled = true;
-          var totalEnabled = d3.sum(dataset.map(function(d) {
-            return (d.enabled) ? 1 : 0;
-          }));
+  //       .attr('width', legendRectSize)
+  //       .attr('height', legendRectSize)
+  //       .style('fill', color) // color('Abulia') returns '#393b79'
+  //       .style('stroke', color)
+  //       .on('click', function(label) {
+  //         var rect = d3.select(this);
+  //         var enabled = true;
+  //         var totalEnabled = d3.sum(dataset.map(function(d) {
+  //           return (d.enabled) ? 1 : 0;
+  //         }));
           
-          if (rect.attr('class') === 'disabled') {
-            rect.attr('class', '');
-          } else {
-            if (totalEnabled < 2) {return;}
-            rect.attr('class', 'disabled');
-            enabled = false;
-          }
+  //         if (rect.attr('class') === 'disabled') {
+  //           rect.attr('class', '');
+  //         } else {
+  //           if (totalEnabled < 2) {return;}
+  //           rect.attr('class', 'disabled');
+  //           enabled = false;
+  //         }
 
-          pie.value(function(d) {
-            if (d.label === label) {d.enabled = enabled;}
-            return (d.enabled) ? d.count : 0;
-          });
+  //         pie.value(function(d) {
+  //           if (d.label === label) {d.enabled = enabled;}
+  //           return (d.enabled) ? d.count : 0;
+  //         });
 
-          path = path.data(pie(dataset));
+  //         path = path.data(pie(dataset));
 
-          path.transition()
-            .duration(750)
-            .attrTween('d', function(d) {
-              var interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return function(t) {
-                return arc(interpolate(t));
-              };
-            });
-        });
+  //         path.transition()
+  //           .duration(750)
+  //           .attrTween('d', function(d) {
+  //             var interpolate = d3.interpolate(this._current, d);
+  //             this._current = interpolate(0);
+  //             return function(t) {
+  //               return arc(interpolate(t));
+  //             };
+  //           });
+  //       });
 
   // // Add the text to the legend
   // legend.append('text')
