@@ -202,28 +202,28 @@ var canvas = d3.select('.jumbotron')
                 .attr('transform', 'translate(20, 0)');
 
 // Add a group for each row of data
-var groups = canvas.selectAll("g")
+var groups = canvas.selectAll('g')
                 .data(stackData)
                 .enter()
-                .append("g")
-                .style("fill", function(d, i) {
+                .append('g')
+                .style('fill', function(d, i) {
                   return colors(i);
                 });
 
-var rects = groups.selectAll("rect")
+var rects = groups.selectAll('rect')
         .data(function(d) { return d; })
         .enter()
-        .append("rect")
-        .attr("x", function(d, i) {
+        .append('rect')
+        .attr('x', function(d, i) {
                 return xScale(i);
         })
-        .attr("y", function(d) {
+        .attr('y', function(d) {
                 return yScale(d.y0);
         })
-        .attr("height", function(d) {
+        .attr('height', function(d) {
                 return yScale(d.y);
         })
-        .attr("width", xScale.rangeBand());
+        .attr('width', xScale.rangeBand());
 
 
 // var bars = canvas.selectAll('rect')
