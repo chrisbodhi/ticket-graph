@@ -1,3 +1,4 @@
+/* global d3:true */
 /* global RSVP:true */
 /* global SW:true */
 'use strict';
@@ -115,16 +116,128 @@ callSW().then(function(allTickets){
 // DONE filter for status: "open"
 // DONE filter for assigned
 // DONE filter for ticket.assignee.ids
-// count each ticket.priority per ticket.assignee.id
+// DONE count each ticket.priority per ticket.assignee.id
+
+var ticketCounts = [
+  {
+    id: 29, 
+    counts: { 
+      highCount: 1, 
+      lowCount: 1, 
+      medCount: 3
+    }
+  },
+  {
+    id: 3, 
+    counts: { 
+      highCount: 2,
+      lowCount: 0,
+      medCount: 3
+    }
+  }, 
+  {
+    id: 2,
+    counts: { 
+      highCount: 0,
+      lowCount: 1,
+      medCount: 3
+    }
+  }
+];
+
+var stackData = [],
+    lowData = [],
+    medData = [],
+    highData = [];
+
+ticketCounts.forEach(function(tc, i){
+  lowData.push({'x': i, 'y': tc.counts.lowCount});
+  medData.push({'x': i, 'y': tc.counts.medCount});
+  highData.push({'x': i, 'y': tc.counts.highCount});
+});
+
+stackData.push(lowData);
+stackData.push(medData);
+stackData.push(highData);
+
+var width = 500,
+    height = 500;
+
+var stack = d3.layout.stack();
+stack(stackData);
+
+var widthScale = d3.scale.linear()
+                  .domain([0, Math.max.apply(0, [10])])
+                  .range([0, width]);
+
+var heightScale = (stackData.length * 100);
+
+//Set up scales
+var xScale = d3.scale.ordinal()
+  .domain(d3.range(stackData[0].length))
+  .rangeRoundBands([0, width], 0.05);
+
+var yScale = d3.scale.linear()
+  .domain([0,       
+    d3.max(stackData, function(d) {
+      return d3.max(d, function(d) {
+        return d.y0 + d.y;
+      });
+    })
+  ])
+  .range([0, height]);
+        
+//Easy colors accessible via a 10-step ordinal scale
+var colors = d3.scale.category10();
+
+var axis = d3.svg.axis()
+              .ticks(5) // total number of ticks
+              .scale(widthScale);
+
+var canvas = d3.select('.jumbotron')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', Math.max(height, heightScale))
+                .append('g') //group the rects on the canvas
+                .attr('transform', 'translate(20, 0)');
+
+// Add a group for each row of data
+var groups = canvas.selectAll("g")
+                .data(stackData)
+                .enter()
+                .append("g")
+                .style("fill", function(d, i) {
+                  return colors(i);
+                });
+
+var rects = groups.selectAll("rect")
+        .data(function(d) { return d; })
+        .enter()
+        .append("rect")
+        .attr("x", function(d, i) {
+                return xScale(i);
+        })
+        .attr("y", function(d) {
+                return yScale(d.y0);
+        })
+        .attr("height", function(d) {
+                return yScale(d.y);
+        })
+        .attr("width", xScale.rangeBand());
 
 
+// var bars = canvas.selectAll('rect')
+//                  .data(stackData)
+//                  .enter()
+//                  .append('rect')
+//                  .attr('width', function (d) { return widthScale(d); })
+//                  .attr('height', 50)
+//                  .attr('fill', 'dodgerblue')
+//                  .attr('y', function (d,i) { return i * 100; });
 
-
-/*
-var url = 'scripts/tickets.json';
-var res = $.getJSON(url);
-// then...
-var allTix = res.responseJSON
-*/
+// Rather than making the canvas variable more clunky, separate concerns!
+canvas.append('g')
+      .attr('transform', 'translate(0, ' + (heightScale - 20) + ')')
+      .call(axis);
 
 
