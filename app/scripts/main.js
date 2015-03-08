@@ -1,226 +1,153 @@
 /* global d3:true */
-/* global SW:true */    
-/* global RSVP:true */    
+/* global RSVP:true */
+/* global SW:true */
 'use strict';
 
-// Set chart dimensions, radius of chart based on smaller of two dimensions
-var width = 360,
-    height = 360,
-    radius = Math.min(width, height) / 2,
-    donutWidth = 75,
-    dataHold = [],
-    pieData = [],
-    unassignedTix = [],
-    counts = {};
+///////////////////////////////////////////////////////////////////////////////
+// START TICKET FILTERING
+var assigneeIds     = [],
+    dataArray       = [], // this will be passed to D3
+    ticketsToChart  = [];
 
-// Set legend variables
-var legendRectSize = 18,
-    legendSpacing = 4;
-
-// Set color scale from D3
-var color = d3.scale.category20b();
-
-var svg = d3.select('#chart') // get DOM element with chart ID
-            .append('svg')    // add an SVG to its end
-            .attr('width', width) // set width...
-            .attr('height', height) // ...and height
-            .append('g') // append a 'g' element to the SVG and then center it
-            .attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
-
-// to define the chart's outer radius
-var arc = d3.svg
-            .arc()
-            .innerRadius(radius - donutWidth)
-            .outerRadius(radius);
-
-// starting and ending angles of the segments - function to be called later
-// return d.count to get the number from the dataset object
-// disable sorting to prevent unintended consequences in the animation
-var pie = d3.layout.pie()
-            .value(function (d) { return d.count; })
-            .sort(null);
-
-var tooltip = d3.select('#chart')
-                .append('div')
-                .attr('class', 'd3-tooltip');
-
-tooltip.append('div')
-       .attr('class', 'label');
-
-tooltip.append('div')
-       .attr('class', 'count');
-
-tooltip.append('div')
-       .attr('class', 'percent');
-
-
-// ticket info
-var url = 'scripts/tickets.json'; 
-
-// tickets pulled from the DB
-// var url = ''
-// var card = new SW.Card();
-// var helpdesk = card.services('helpdesk');
-// helpdesk.request('tickets')
-//   .then(function(data) {
-//     url = data;
-//   });
-
-var prepData = function(dataset){
+var callSW = function(){
   var promise = new RSVP.Promise(function(resolve, reject){
-    var ids = dataset.map(function(d){
-      if (d.assignee){
-        return d.assignee.id;
-      } else {
-        unassignedTix = unassignedTix.concat(d);
+    var card = new SW.Card();
+    var helpdesk = card.services('helpdesk');
+    helpdesk.request('tickets')
+      .then(function(data) {
+        if (data.tickets.length > 0){
+          resolve(data.tickets);
+        } else {
+          reject('err');
+        }
+      });
+    });
+  return promise;
+};
+
+////////////////////////////////////
+// Get the tickets we want to chart
+callSW().then(function(allTickets){
+  ticketsToChart = allTickets.filter(function(ticket, index, arr){
+    if (ticket.status === 'open' && ticket.assignee) { return ticket; }
+  });
+  ////////////////////////////////
+  // Get an array of the assignees
+  assigneeIds = ticketsToChart.map(function(ticket, index, arr){
+    return ticket.assignee.id;
+  });
+  // http://stackoverflow.com/a/9229821/2276791
+  var uniqIds = function(a) {
+    var seen  = {},
+        out   = [],
+        len   = a.length,
+        j     = 0;
+    for(var i = 0; i < len; i++) {
+      var item = a[i];
+      if(seen[item] !== 1) {
+        seen[item] = 1;
+        out[j++] = item;
       }
-    });
-
-    ids.sort();
-    ids.forEach(function(x) { counts[x] = (counts[x] || 0 ) + 1; });
-
-    Object.keys(counts).forEach(function(c){
-      dataHold = dataHold.concat({label: c, count: counts[c]});
-    });
-    if (dataHold.length > 0) {
-      resolve(dataHold);
-    } else {
-      reject('err');
     }
-  });
-  return promise;
-};
+    return out;
+  };
+  assigneeIds = uniqIds(assigneeIds);
 
-var findById = function(source, id) {
-  return source.filter(function( obj ) {
-    return +obj.id === +id;
-  })[0];
-};
+  var calcDaysOpen = function(time){
+    var floatDays = (Date.now() - new Date(time))/(1000*60*60*24);
+    return Math.floor(floatDays);
+  };
 
-var newLabel = function(i, data){
-  console.log(data.users);
-  if (dataHold[i].label != 'undefined'){
-    var user = findById(data.users, +dataHold[i].label);
-    return user.first_name;
-  } else {
-    return 'undefined';
-  }
-};
+  var getTicketData = function(t){
+    var info = {};
+    info.ticketId = t.id;
+    info.priority = t.priority;
+    info.daysOpen = calcDaysOpen(t.created_at);
+    info.reopened = t.reopened;
+    return info;
+  };
 
-// For labels, after dumping into dataHold, get assignee name using ID
-var labelData = function(dataHold, data){
-  var promise = new RSVP.Promise(function(resolve, reject){
-    var indices = Object.keys(dataHold).map(function(i){return +i;});
-    indices.forEach(function(i){
-      pieData = pieData.concat({
-        label: newLabel(i, data),
-        count: +dataHold[i].count 
-      });
+  var theirTickets = function(assigneeId){
+    return ticketsToChart.filter(function(t, index, arr){
+      if (assigneeId === t.assignee.id){
+        return t;
+      } 
     });
-    if (pieData.length > 0){
-      resolve(pieData);
-    } else {
-      reject('err');
-    }
-  });
-  return promise;
-};
+  };
 
-var buildChart = function(url, pieData){
-  var promise = new RSVP.Promise(function(resolve, reject){
-    // create the chart
-    var path = svg.selectAll('path') // select all 'path' in g in the svg, but they don't exist yet
-                  .data(pie(pieData)) // associate dataset with path elements
-                  .enter() // creates a placeholder node for each dataset value
-                  .append('path') // replace placeholder with 'path' element
-                  .attr('d', arc) // define a d attribute for each path element
-                  .attr('fill', function(d, i){ // use the colorscale to fill each path
-                    return color(d.data.label);
-                  })
-                  .each(function(d){ this._current = d; });
-
-    // define and add the legend for the chart
-    var legend = svg.selectAll('.legend') // select elements with legend class, but they don't exist yet
-                    .data(color.domain()) // call data with arrays of labels from the dataset
-                    .enter() // creates the placeholders
-                    .append('g') // replace placeholders with the g elements
-                    .attr('class', 'legend') // give each g element the legend class
-                    .attr('transform', function(d, i){ // centers the legend
-                      var height = legendRectSize + legendSpacing,
-                          offset = height * color.domain().length / 2,
-                          horz = -2 * legendRectSize, // shifts left of center
-                          vert = i * height - offset;
-                      return 'translate(' + horz + ',' + vert + ')';
-                    });
-
-    // Add the square and label for the legend
-    legend.append('rect')
-          .attr('width', legendRectSize)
-          .attr('height', legendRectSize)
-          .style('fill', color) // color('Abulia') returns '#393b79'
-          .style('stroke', color)
-          .on('click', function(label) {
-            var rect = d3.select(this);
-            var enabled = true;
-            var totalEnabled = d3.sum(pieData.map(function(d) {
-              return (d.enabled) ? 1 : 0;
-            }));
-            
-            if (rect.attr('class') === 'disabled') {
-              rect.attr('class', '');
-            } else {
-              if (totalEnabled < 2) {return;}
-              rect.attr('class', 'disabled');
-              enabled = false;
-            }
-
-            pie.value(function(d) {
-              if (d.label === label) {d.enabled = enabled;}
-              return (d.enabled) ? d.count : 0;
-            });
-
-            path = path.data(pie(pieData));
-
-            path.transition()
-              .duration(750)
-              .attrTween('d', function(d) {
-                var interpolate = d3.interpolate(this._current, d);
-                this._current = interpolate(0);
-                return function(t) {
-                  return arc(interpolate(t));
+  assigneeIds.forEach(function(a){
+    var bucket = { 
+                  'assigneeId': a,
+                  'assigneeName': '', 
+                  'tickets': [] 
                 };
-              });
-          });
-
-    // Add the text to the legend
-    legend.append('text')
-          .attr('x', legendRectSize + legendSpacing)
-          .attr('y', legendRectSize - legendSpacing)
-          .text(function(d) { 
-            if (d === 'undefined') {
-              return 'Not assigned :\'(';
-            } else {
-              return d;
-            }
-          });
-  });
-  return promise;
-};
-
-
-
-d3.json(url, function(error, dataset){
-  var card = new SW.Card();
-  card.services('environment').request('users')
-    .then(function(data){
-      prepData(dataset).then(function(dataHold){
-        return labelData(dataHold, data);
-      }).then(function(pieData){
-        buildChart(url, pieData);
-      }).catch(function(error){
-        console.log(error);
-        return;
-      });
+    var theseTickets = theirTickets(a);
+    theseTickets.forEach(function(t){
+      bucket.tickets.push(getTicketData(t));
     });
-});
+    dataArray.push(bucket);
+    bucket = {};
+  });
 
+  var graphData = [];
+  var width = 500,
+      height = 500;
+
+  graphData = dataArray.map(function(e,i,arr){
+    return e.tickets.length;
+  });
+
+  var widthScale = d3.scale.linear()
+                    .domain([0, Math.max.apply(0, graphData)])
+                    .range([0, width]);
+
+  var heightScale = (graphData.length * 100);
+
+  var color = d3.scale.linear()
+                .domain([0, Math.max.apply(0, graphData)])
+                .range(['navajowhite', 'tomato']);
+
+  var axis = d3.svg.axis()
+                .ticks(5) // total number of ticks
+                .scale(widthScale);
+
+  var canvas = d3.select('.jumbotron')
+                  .append('svg')
+                  .attr('width', width)
+                  .attr('height', Math.max(height, heightScale))
+                  .append('g') //group the rects on the canvas
+                  .attr('transform', 'translate(20, 0)');
+
+  var bars = canvas.selectAll('rect')
+                   .data(graphData)
+                   .enter()
+                   .append('rect')
+                   .attr('width', function (d) { return widthScale(d); })
+                   .attr('height', 50)
+                   .attr('fill', function (d) { return color(d); })
+                   .attr('y', function (d,i) { return i * 100; });
+
+  // Rather than making the canvas variable more clunky, separate concerns!
+  canvas.append('g')
+        .attr('transform', 'translate(0, ' + (heightScale - 20) + ')')
+        .call(axis);
+
+});
+// END TICKET FILTERING AKA GIANT PROMISE RESOLUTION
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+// Reference on tooltips
+  // var tooltip = d3.select('#chart')
+  //                 .append('div')
+  //                 .attr('class', 'd3-tooltip');
+
+  // tooltip.append('div')
+  //        .attr('class', 'label');
+
+  // tooltip.append('div')
+  //        .attr('class', 'count');
+
+  // tooltip.append('div')
+  //        .attr('class', 'percent');
