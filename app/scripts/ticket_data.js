@@ -88,6 +88,27 @@ callSW().then(function(allTickets){
   });
   
   console.log(dataArray);
+
+  var priorities = []; // PRIORITIES!
+
+  dataArray.forEach(function(d){
+    var lowCount = d.tickets.filter(function(t,index,arr){
+      if (t.priority === 1){return 1; }
+    }).length;
+    var medCount = d.tickets.filter(function(t,index,arr){
+      if (t.priority === 2){return 1; }
+    }).length;
+    var highCount = d.tickets.filter(function(t,index,arr){
+      if (t.priority === 3){return 1; }
+    }).length;
+    priorities.push({'id': d.assigneeId, counts: {
+      'lowCount': lowCount,
+      'medCount': medCount,
+      'highCount': highCount
+    }});
+  });
+
+  console.log(priorities);
 });
 
 
