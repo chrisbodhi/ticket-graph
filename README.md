@@ -8,3 +8,14 @@ Install through the [Spiceworks App Center]()
 
 ###Contributing
 Sure!
+
+####Main Tech &amp; Tools
+
+- D3.js
+- Yeoman generator
+- RSVP
+- jQuery
+- Bootstrap
+- HTML5 + (Sass => CSS3)
+- Grunt
+- Bower

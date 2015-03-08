@@ -103,9 +103,10 @@ callSW().then(function(allTickets){
 
   var heightScale = (graphData.length * 100);
 
-  var color = d3.scale.linear()
-                .domain([0, Math.max.apply(0, graphData)])
-                .range(['navajowhite', 'tomato']);
+  // Suitable for gradient based on age?
+  // var color = d3.scale.linear()
+  //               .domain([0, Math.max.apply(0, graphData)])
+  //               .range(['lightblue', 'dodgerblue']);
 
   var axis = d3.svg.axis()
                 .ticks(5) // total number of ticks
@@ -124,7 +125,7 @@ callSW().then(function(allTickets){
                    .append('rect')
                    .attr('width', function (d) { return widthScale(d); })
                    .attr('height', 50)
-                   .attr('fill', function (d) { return color(d); })
+                   .attr('fill', 'dodgerblue')
                    .attr('y', function (d,i) { return i * 100; });
 
   // Rather than making the canvas variable more clunky, separate concerns!
