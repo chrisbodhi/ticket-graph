@@ -12,3 +12,4 @@ dist
 notes.md
 1.txt
 app/scripts/info_dump.js
+app/scripts/sandbox.js
