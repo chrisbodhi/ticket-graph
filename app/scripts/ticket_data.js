@@ -112,12 +112,6 @@ callSW().then(function(allTickets){
   console.log(priorities);
 });
 
-
-// DONE filter for status: "open"
-// DONE filter for assigned
-// DONE filter for ticket.assignee.ids
-// DONE count each ticket.priority per ticket.assignee.id
-
 var ticketCounts = [
   {
     id: 29, 
@@ -151,9 +145,9 @@ var stackData = [],
     highData = [];
 
 ticketCounts.forEach(function(tc, i){
-  lowData.push({'x': i, 'y': tc.counts.lowCount});
-  medData.push({'x': i, 'y': tc.counts.medCount});
-  highData.push({'x': i, 'y': tc.counts.highCount});
+  lowData.push({'x': tc.counts.lowCount, 'y': i});
+  medData.push({'x': tc.counts.medCount, 'y': i});
+  highData.push({'x': tc.counts.highCount, 'y': i});
 });
 
 stackData.push(lowData);
@@ -164,13 +158,27 @@ var width = 500,
     height = 500;
 
 var stack = d3.layout.stack();
+
 stack(stackData);
+
+stackData = stackData.map(function (group) {
+  return group.map(function (d) {
+    // Invert the x and y values, and y0 becomes x0
+    return {
+      x: d.x,
+      y: d.y,
+      x0: d.y0
+    };
+  });
+});
+
+console.log(stackData);
+
+var heightScale = (stackData.length * 100);
 
 var widthScale = d3.scale.linear()
                   .domain([0, Math.max.apply(0, [10])])
                   .range([0, width]);
-
-var heightScale = (stackData.length * 100);
 
 //Set up scales
 var xScale = d3.scale.ordinal()
@@ -181,7 +189,7 @@ var yScale = d3.scale.linear()
   .domain([0,       
     d3.max(stackData, function(d) {
       return d3.max(d, function(d) {
-        return d.y0 + d.y;
+        return d.x0 + d.x;
       });
     })
   ])
@@ -214,16 +222,16 @@ var rects = groups.selectAll('rect')
         .data(function(d) { return d; })
         .enter()
         .append('rect')
-        .attr('x', function(d, i) {
-                return xScale(i);
+        .attr('x', function(d) {
+                return xScale(d.x0);
         })
-        .attr('y', function(d) {
-                return yScale(d.y0);
+        .attr('y', function(d, i) {
+                return yScale(i);
         })
-        .attr('height', function(d) {
-                return yScale(d.y);
-        })
-        .attr('width', xScale.rangeBand());
+        .attr('height', xScale.rangeBand())
+        .attr('width', function(d) {
+                return yScale(d.y); 
+        });
 
 
 // var bars = canvas.selectAll('rect')
