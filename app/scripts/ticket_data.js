@@ -170,7 +170,7 @@ var stackData = ticketCounts.map(function (d){
   });
 });
 
-var width = 500,
+var width = 600,
     height = 500;
 
 var priorityLevels = ticketCounts.map(function (t){
@@ -192,18 +192,10 @@ stackData = stackData.map(function (group) {
   });
 });
 
-console.log(stackData);
-
-var widthScale = d3.scale.linear()
-                  .domain([0, Math.max.apply(0, stackData)])
-                  .range([0, width]);
-
-var heightScale = (stackData.length * 100);
-
 //Set up scales
 var xMax = d3.max(stackData, function (group) {
     return d3.max(group, function (d) {
-        return d.x + d.x0;
+      return d.x + d.x0;
     });
 });
 
@@ -216,15 +208,14 @@ var names = ['Alice', 'Bob', 'Carol'];
 
 var yScale = d3.scale.ordinal()
         .domain(names)
-        .rangeRoundBands([0, height], .1);
+        .rangeRoundBands([0, height], 0.1);
         
 //Easy colors accessible via a 10-step ordinal scale
 var colors = d3.scale.category10();
 
 var canvas = d3.select('.jumbotron')
                 .append('svg')
-                .attr('width', width)
-                // .attr('height', Math.max(height, heightScale))
+                .attr('width', width + 60)
                 .attr('height', height)
                 .append('g') //group the rects on the canvas
                 .attr('transform', 'translate(20, 0)');
@@ -253,7 +244,22 @@ var rects = groups.selectAll('rect')
         })
         .attr('width', function(d) {
                 return xScale(d.x); 
-        });
+        })
+        .on('mouseover', function (d) {
+          var xPos = parseFloat(d3.select(this).attr('x')) + width;
+          var yPos = parseFloat(d3.select(this).attr('y')) + yScale.rangeBand();
+          
+          d3.select('#d3-tooltip')
+              .style('left', xPos + 'px')
+              .style('top', yPos + 'px')
+              .select('#value')
+              .text(d.x);
+
+          d3.select('#d3-tooltip').classed('hidden', false);
+      })
+      .on('mouseout', function () {
+        d3.select('#d3-tooltip').classed('hidden', true);
+      });
 
 // Axis, no Allies
 var xAxis = d3.svg.axis()
