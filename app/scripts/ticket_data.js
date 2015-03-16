@@ -88,8 +88,6 @@ callSW().then(function(allTickets){
     bucket = {};
   });
   
-  console.log(dataArray);
-
   var priorities = []; // PRIORITIES!
 
   dataArray.forEach(function(d){
@@ -114,48 +112,70 @@ callSW().then(function(allTickets){
 
 var ticketCounts = [
   {
-    id: 29, 
-    counts: { 
-      highCount: 1, 
-      lowCount: 1, 
-      medCount: 3
-    }
+    priority: 'Low',
+    data: [{ 
+            assId: 'Alice', 
+            count: 1
+          },
+          {
+            assId: 'Bob',
+            count: 0
+          },
+          {
+            assId: 'Carol',
+            count: 1
+          } 
+    ]
   },
   {
-    id: 3, 
-    counts: { 
-      highCount: 2,
-      lowCount: 0,
-      medCount: 3
-    }
-  }, 
+    priority: 'Medium',
+    data: [{ 
+            assId: 'Alice', 
+            count: 3
+          },
+          {
+            assId: 'Bob',
+            count: 3
+          },
+          {
+            assId: 'Carol',
+            count: 3
+          } 
+    ]
+  },
   {
-    id: 2,
-    counts: { 
-      highCount: 0,
-      lowCount: 1,
-      medCount: 3
-    }
+    priority: 'High',
+    data: [{ 
+            assId: 'Alice', 
+            count: 1
+          },
+          {
+            assId: 'Bob',
+            count: 2
+          },
+          {
+            assId: 'Carol',
+            count: 0
+          } 
+    ]
   }
 ];
 
-var stackData = [],
-    lowData = [],
-    medData = [],
-    highData = [];
-
-ticketCounts.forEach(function(tc, i){
-  lowData.push({'x': tc.counts.lowCount, 'y': i});
-  medData.push({'x': tc.counts.medCount, 'y': i});
-  highData.push({'x': tc.counts.highCount, 'y': i});
+var stackData = ticketCounts.map(function (d){
+  return d.data.map(function (t, i){
+    return {
+      y: t.count,
+      x: t.assId
+    };
+  });
 });
-
-stackData.push(lowData);
-stackData.push(medData);
-stackData.push(highData);
 
 var width = 500,
     height = 500;
+
+var priorityLevels = ticketCounts.map(function (t){
+  return t.priority;
+});
 
 var stack = d3.layout.stack();
 
@@ -165,8 +185,8 @@ stackData = stackData.map(function (group) {
   return group.map(function (d) {
     // Invert the x and y values, and y0 becomes x0
     return {
-      x: d.x,
-      y: d.y,
+      x: d.y,
+      y: d.x,
       x0: d.y0
     };
   });
@@ -174,38 +194,38 @@ stackData = stackData.map(function (group) {
 
 console.log(stackData);
 
-var heightScale = (stackData.length * 100);
-
 var widthScale = d3.scale.linear()
-                  .domain([0, Math.max.apply(0, [10])])
+                  .domain([0, Math.max.apply(0, stackData)])
                   .range([0, width]);
 
-//Set up scales
-var xScale = d3.scale.ordinal()
-  .domain(d3.range(stackData[0].length))
-  .rangeRoundBands([0, width], 0.05);
+var heightScale = (stackData.length * 100);
 
-var yScale = d3.scale.linear()
-  .domain([0,       
-    d3.max(stackData, function(d) {
-      return d3.max(d, function(d) {
-        return d.x0 + d.x;
-      });
-    })
-  ])
-  .range([0, height]);
+//Set up scales
+var xMax = d3.max(stackData, function (group) {
+    return d3.max(group, function (d) {
+        return d.x + d.x0;
+    });
+});
+
+var xScale = d3.scale.linear()
+        .domain([0, xMax])
+        .range([0, width]);
+
+// todo: programatically get names into an array
+var names = ['Alice', 'Bob', 'Carol'];        
+
+var yScale = d3.scale.ordinal()
+        .domain(names)
+        .rangeRoundBands([0, height], .1);
         
 //Easy colors accessible via a 10-step ordinal scale
 var colors = d3.scale.category10();
 
-var axis = d3.svg.axis()
-              .ticks(5) // total number of ticks
-              .scale(widthScale);
-
 var canvas = d3.select('.jumbotron')
                 .append('svg')
                 .attr('width', width)
-                .attr('height', Math.max(height, heightScale))
+                // .attr('height', Math.max(height, heightScale))
+                .attr('height', height)
                 .append('g') //group the rects on the canvas
                 .attr('transform', 'translate(20, 0)');
 
@@ -225,27 +245,33 @@ var rects = groups.selectAll('rect')
         .attr('x', function(d) {
                 return xScale(d.x0);
         })
-        .attr('y', function(d, i) {
-                return yScale(i);
+        .attr('y', function(d) {
+                return yScale(d.y);
         })
-        .attr('height', xScale.rangeBand())
+        .attr('height', function (d) {
+          return yScale.rangeBand();
+        })
         .attr('width', function(d) {
-                return yScale(d.y); 
+                return xScale(d.x); 
         });
 
+// Axis, no Allies
+var xAxis = d3.svg.axis()
+    .scale(xScale)
+    .ticks(stackData[0].length)
+    .orient('bottom');
 
-// var bars = canvas.selectAll('rect')
-//                  .data(stackData)
-//                  .enter()
-//                  .append('rect')
-//                  .attr('width', function (d) { return widthScale(d); })
-//                  .attr('height', 50)
-//                  .attr('fill', 'dodgerblue')
-//                  .attr('y', function (d,i) { return i * 100; });
+var yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient('left');  
 
-// Rather than making the canvas variable more clunky, separate concerns!
 canvas.append('g')
-      .attr('transform', 'translate(0, ' + (heightScale - 20) + ')')
-      .call(axis);
+    .attr('class', 'axis')
+    .attr('transform', 'translate(' + 30 + ',' + (height - 20) + ')')
+    .call(xAxis);
 
+canvas.append('g')
+    .attr('class', 'axis')
+    .attr('transform', 'translate(' + 30 + ', 0)')
+    .call(yAxis); 
 
