@@ -90,25 +90,50 @@ callSW().then(function(allTickets){
   
   var priorities = []; // PRIORITIES!
 
-  dataArray.forEach(function(d){
-    var lowCount = d.tickets.filter(function(t,index,arr){
-      if (t.priority === 1){return 1; }
-    }).length;
-    var medCount = d.tickets.filter(function(t,index,arr){
-      if (t.priority === 2){return 1; }
-    }).length;
-    var highCount = d.tickets.filter(function(t,index,arr){
-      if (t.priority === 3){return 1; }
-    }).length;
-    priorities.push({'id': d.assigneeId, counts: {
-      'lowCount': lowCount,
-      'medCount': medCount,
-      'highCount': highCount
-    }});
-  });
+  priorities.push(
+    { priority: 'Low', 
+      data: []
+    },
+    { priority: 'Medium', 
+      data: []
+    },
+    { priority: 'High', 
+      data: []}
+    );
 
-  console.log(priorities);
+  var getCount = function (data, priorityInt) {
+    return data.tickets.filter( function(t,index,arr) {
+      if ( t.priority === priorityInt ){ return 1; }
+    }).length;
+  };
+
+  var assignPriorities = function(d, lowCount, medCount, highCount){
+    priorities.forEach(function(p){
+      if (p.priority === 'Low'){
+        p.data.push({'assId': d.assigneeId, 'count': lowCount });
+      } else if (p.priority === 'Medium'){
+        p.data.push({'assId': d.assigneeId, 'count': medCount });
+      } else if (p.priority === 'High'){
+        p.data.push({'assId': d.assigneeId, 'count': highCount });
+      } else {
+        console.error('No priority noted for ticket ' + d);
+      }
+    });
+  };
+
+  dataArray.forEach(function(d){
+    var lowCount = getCount(d, 1);
+    var medCount = getCount(d, 2);
+    var highCount = getCount(d, 3);
+    
+    assignPriorities(d, lowCount, medCount, highCount);
+  });
 });
+
+// todo: fold in new code into main.js
+// todo: make sure names are built into an array ahead of ticket graphing :265
+// todo: update commenting of which blocks do what
+// todo: get some good sleep!
 
 var ticketCounts = [
   {
