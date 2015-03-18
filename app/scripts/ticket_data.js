@@ -130,9 +130,9 @@ callSW().then(function(allTickets){
   });
 });
 
-// todo: fold in new code into main.js
+// ~~todo: fold in new code into main.js~~
 // todo: make sure names are built into an array ahead of ticket graphing :265
-// todo: update commenting of which blocks do what
+// ~~todo: update commenting of which blocks do what~~
 // todo: get some good sleep!
 
 var ticketCounts = [
