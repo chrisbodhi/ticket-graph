@@ -96,25 +96,6 @@ body {
     line-height: 20px;
 }
 
-
-// #d3-tooltip {                                                        
-//   background: #eee;                                               
-//   box-shadow: 0 0 5px #999999;                                    
-//   color: #333;                                                    
-//   display: none;                                                  
-//   font-size: 12px;                                                
-//   left: 140px;
-//   padding: 10px;                                                  
-//   position: absolute;                                             
-//   text-align: center;                                             
-//   top: 95px;
-//   width: 80px;                                                    
-//   z-index: 10;   
-//   .label {
-//     color: black;
-//   }                                                 
-// }    
-
 .legend {
   font-size: 12px;
 }
@@ -125,6 +106,23 @@ rect {
     fill: transparent !important;
   }
 }
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: gray;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
+
+
+// x axis: '', 'translate(' + 5 + ',' + (height - 20) + ')')
+// y axis: 'transform', 'translate(' + 5 + ', 0)'
+
 /////////////////////////////////////////////////////////////////////////////// 
 // chart bizness end
 /////////////////////////////////////////////////////////////////////////////// 

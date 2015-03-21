@@ -253,11 +253,10 @@ callSW().then(function(allTickets){
 
   canvas.append('g')
       .attr('class', 'axis')
-      .attr('transform', 'translate(' + 5 + ',' + (height - 20) + ')')
+      .attr('transform', 'translate(0,' + (height - 17) + ')')
       .call(xAxis);
 
   canvas.append('g')
       .attr('class', 'axis')
-      .attr('transform', 'translate(' + 5 + ', 0)')
       .call(yAxis); 
 });
