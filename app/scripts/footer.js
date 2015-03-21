@@ -27,17 +27,28 @@ var getTicketData = function(t){
 // Ticket priorities holder
 var priorities = [
   { priority: 'Low', 
-    data: []
+    data: [{'count': 2 }]
   },
   { priority: 'Medium', 
-    data: []
+    data: [{'count': 4 }]
   },
   { priority: 'High', 
-    data: []}
+    data: [{'count': 1 }]
+  }
 ];
+// var priorities = [
+//   { priority: 'Low', 
+//     data: []
+//   },
+//   { priority: 'Medium', 
+//     data: []
+//   },
+//   { priority: 'High', 
+//     data: []}
+// ];
 
 var getCount = function (data, priorityInt) {
-  return data.tickets.filter( function(t,index,arr) {
+  return data.filter(function(t,index,arr) {
     if ( t.priority === priorityInt ){ return 1; }
   }).length;
 };
@@ -87,160 +98,130 @@ var getMyTickets = function(user){
 };
 
 var readyTheTickets = function(tickets){
-  console.log(tickets.length);
-  // var promise = new RSVP.Promise(function(resolve, reject){
-    myTickets.forEach(function(t){
+  var promise = new RSVP.Promise(function(resolve, reject){  
+    tickets.forEach(function(t){
       dataArray.push(getTicketData(t));
     });
     // Prepare the data for processing by D3
-    dataArray.forEach(function(d){
-      var lowCount  = getCount(d, 1),
-          medCount  = getCount(d, 2),
-          highCount = getCount(d, 3);    
-      assignPriorities(lowCount, medCount, highCount);
-    });
+    var lowCount  = getCount(dataArray, 1),
+        medCount  = getCount(dataArray, 2),
+        highCount = getCount(dataArray, 3);    
+    assignPriorities(lowCount, medCount, highCount);
     console.log(priorities);
-    // resolve(priorities);
-  // });
-  // return promise;
+    if (priorities){
+      resolve(priorities);
+    } else {
+      reject('errrrrrr');
+    }
+  });
+  return promise;
 };
 
+// No need to return a promise if it's the last `then` in the chain
 var graphMaker = function(priorities){
-  // var promise = new RSVP.Promise(function(resolve, reject){
-    console.log('graphMaker called');
-    console.log(priorities);
-  //   if (data.tickets.length > 0){
-  //     resolve(data.tickets);
-  //   } else {
-  //     reject('err');
-  //   }
-  // });
-  // return promise;
+  console.log('graphMaker called');
+  var stackData = priorities.map(function (d){
+    return d.data.map(function (t, i){
+      return {
+        x: 1,
+        y: t.count        
+      };
+    });
+  });
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // GRAPH MAKING
+  var width = 300,
+      height = 500;
+
+  var stack = d3.layout.stack();
+
+  stack(stackData);
+
+
+  //Set up scales
+  var xScale = d3.scale.ordinal()
+    .domain(d3.range(stackData[0].length))
+    .rangeRoundBands([0, width], 0.05);
+  
+  var yScale = d3.scale.linear()
+    .domain([0,       
+      d3.max(stackData, function(d) {
+        return d3.max(d, function(d) {
+          return d.y0 + d.y;
+        });
+      })
+    ])
+    .range([0, height]);
+    
+  //Easy colors accessible via a 10-step ordinal scale
+  var colors = d3.scale.category10();
+  
+  //Create SVG element
+  var svg = d3.select('.jumbotron')
+                  .append('svg')
+                  .attr('width', width + 60)
+                  .attr('height', height)
+                  .append('g') //group the rects on the svg
+                  .attr('transform', 'translate(20, 0)');
+  
+  // Add a group for each row of data
+  var groups = svg.selectAll("g")
+    .data(stackData)
+    .enter()
+    .append("g")
+    .style("fill", function(d, i) {
+      return colors(i);
+    });
+  
+  // Add a rect for each data value
+  var rects = groups.selectAll("rect")
+    .data(function(d) { return d; })
+    .enter()
+    .append("rect")
+    .attr("x", function(d, i) {
+      return xScale(i);
+    })
+    .attr("y", function(d) {
+      return yScale(d.y0);
+    })
+    .attr("height", function(d) {
+      return yScale(d.y);
+    })
+    .attr("width", xScale.rangeBand())
+    .on('mouseover', function (d) {
+      var xPos = parseFloat(d3.select(this).attr('x'));
+      var yPos = parseFloat(d3.select(this).attr('y'));
+      console.log(xPos);
+      console.log(yPos);
+      d3.select('#d3-tooltip')
+          .style('left', (xPos + width) + 'px')
+          .style('top', yPos + (height / 4) + 'px')
+          .select('#value')
+          .text(d.y);
+      d3.select('#d3-tooltip').classed('hidden', false);
+    })
+    .on('mouseout', function () {
+      d3.select('#d3-tooltip').classed('hidden', true);
+    });
+
+  // Axis, no Allies
+  var yAxis = d3.svg.axis()
+      .scale(yScale)
+      .orient('left');  
+
+  svg.append('g')
+      .attr('class', 'axis')
+      .call(yAxis); 
 };
 
-var logging = function(data){console.log('logged ' + data.length)};
+var logging = function(data){console.log('logged ' + data.length);};
+// .then(logging)
 
-getUser()
-  .then(getMyTickets)
-  .then(logging)
-  .then(readyTheTickets)
-  .then(graphMaker);
-  
-//   // ...and here
-//   var stackData = priorities.map(function (d){
-//     return d.data.map(function (t, i){
-//       return {
-//         y: t.count
-//       };
-//     });
-//   });
+// getUser()
+//   .then(getMyTickets)
+//   .then(readyTheTickets)
+//   .then(graphMaker);
 
-//   ///////////////////////////////////////////////////////////////////////////////
-//   // GRAPH MAKING
-//   var width = 600,
-//       height = 500;
+graphMaker(priorities);
 
-
-//   var stack = d3.layout.stack();
-
-//   stack(stackData);
-
-//   stackData = stackData.map(function (group) {
-//     return group.map(function (d) {
-//       // Invert the x and y values, and y0 becomes x0
-//       return {
-//         x: d.y,
-//         y: d.x,
-//         x0: d.y0
-//       };
-//     });
-//   });
-
-//   //Set up scales
-//   var xMax = d3.max(stackData, function (group) {
-//       return d3.max(group, function (d) {
-//         return d.x + d.x0;
-//       });
-//   });
-
-//   var xScale = d3.scale.linear()
-//           .domain([0, xMax])
-//           .range([0, width]);
-
-//   // todo: programatically get names into an array
-//   var names = [29, 3, 2];        
-//   // var names = ['Alice', 'Bob', 'Carol'];        
-
-//   var yScale = d3.scale.ordinal()
-//           .domain(names)
-//           .rangeRoundBands([0, height], 0.1);
-          
-//   var colors = d3.scale.category10();
-
-//   var canvas = d3.select('.jumbotron')
-//                   .append('svg')
-//                   .attr('width', width + 60)
-//                   .attr('height', height)
-//                   .append('g') //group the rects on the canvas
-//                   .attr('transform', 'translate(20, 0)');
-
-//   // Add a group for each row of data
-//   var groups = canvas.selectAll('g')
-//                   .data(stackData)
-//                   .enter()
-//                   .append('g')
-//                   .style('fill', function(d, i) {
-//                     return colors(i);
-//                   });
-
-//   var rects = groups.selectAll('rect')
-//           .data(function(d) { return d; })
-//           .enter()
-//           .append('rect')
-//           .attr('x', function(d) {
-//                   return xScale(d.x0);
-//           })
-//           .attr('y', function(d) {
-//                   return yScale(d.y);
-//           })
-//           .attr('height', function (d) {
-//             return yScale.rangeBand();
-//           })
-//           .attr('width', function(d) {
-//                   return xScale(d.x); 
-//           })
-//           .on('mouseover', function (d) {
-//             var xPos = parseFloat(d3.select(this).attr('x')) + width;
-//             var yPos = parseFloat(d3.select(this).attr('y')) + yScale.rangeBand();
-//             console.log(xPos);
-//             console.log(yPos);
-//             d3.select('#d3-tooltip')
-//                 .style('left', (xPos - (width / 2)) + 'px')
-//                 .style('top', yPos + 'px')
-//                 .select('#value')
-//                 .text(d.x);
-//             d3.select('#d3-tooltip').classed('hidden', false);
-//         })
-//         .on('mouseout', function () {
-//           d3.select('#d3-tooltip').classed('hidden', true);
-//         });
-
-//   // Axis, no Allies
-//   var xAxis = d3.svg.axis()
-//       .scale(xScale)
-//       .ticks(stackData[0].length)
-//       .orient('bottom');
-
-//   var yAxis = d3.svg.axis()
-//       .scale(yScale)
-//       .orient('left');  
-
-//   canvas.append('g')
-//       .attr('class', 'axis')
-//       .attr('transform', 'translate(0,' + (height - 17) + ')')
-//       .call(xAxis);
-
-//   canvas.append('g')
-//       .attr('class', 'axis')
-//       .call(yAxis); 
-// });
