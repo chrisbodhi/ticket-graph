@@ -131,7 +131,7 @@ var graphMaker = function(priorities){
 
   ///////////////////////////////////////////////////////////////////////////////
   // GRAPH MAKING
-  var width = 300,
+  var width = 200,
       height = 400;
 
   var stack = d3.layout.stack();
@@ -188,7 +188,7 @@ var graphMaker = function(priorities){
     .attr("height", function(d) {
       return yScale(d.y);
     })
-    .attr("width", width / 2)
+    .attr("width", width * .8)
     .on('mouseover', function (d) {
       var xPos = parseFloat(d3.select(this).attr('x'));
       var yPos = parseFloat(d3.select(this).attr('y'));
