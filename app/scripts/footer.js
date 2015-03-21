@@ -132,7 +132,7 @@ var graphMaker = function(priorities){
   ///////////////////////////////////////////////////////////////////////////////
   // GRAPH MAKING
   var width = 300,
-      height = 500;
+      height = 400;
 
   var stack = d3.layout.stack();
 
@@ -160,7 +160,7 @@ var graphMaker = function(priorities){
   //Create SVG element
   var svg = d3.select('.jumbotron')
                   .append('svg')
-                  .attr('width', width + 60)
+                  .attr('width', width)
                   .attr('height', height)
                   .append('g') //group the rects on the svg
                   .attr('transform', 'translate(20, 0)');
@@ -188,15 +188,13 @@ var graphMaker = function(priorities){
     .attr("height", function(d) {
       return yScale(d.y);
     })
-    .attr("width", xScale.rangeBand())
+    .attr("width", width / 2)
     .on('mouseover', function (d) {
       var xPos = parseFloat(d3.select(this).attr('x'));
       var yPos = parseFloat(d3.select(this).attr('y'));
-      console.log(xPos);
-      console.log(yPos);
       d3.select('#d3-tooltip')
-          .style('left', (xPos + width) + 'px')
-          .style('top', yPos + (height / 4) + 'px')
+          .style('left', (xPos + (width / 2)) + 'px')
+          .style('top', (yPos + (height / 4)) + 'px')
           .select('#value')
           .text(d.y);
       d3.select('#d3-tooltip').classed('hidden', false);
