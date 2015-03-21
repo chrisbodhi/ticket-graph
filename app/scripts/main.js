@@ -228,13 +228,13 @@ callSW().then(function(allTickets){
           .on('mouseover', function (d) {
             var xPos = parseFloat(d3.select(this).attr('x')) + width;
             var yPos = parseFloat(d3.select(this).attr('y')) + yScale.rangeBand();
-            
+            console.log(xPos);
+            console.log(yPos);
             d3.select('#d3-tooltip')
-                .style('left', (xPos - 25) + 'px')
+                .style('left', (xPos - (width / 2)) + 'px')
                 .style('top', yPos + 'px')
                 .select('#value')
                 .text(d.x);
-
             d3.select('#d3-tooltip').classed('hidden', false);
         })
         .on('mouseout', function () {
