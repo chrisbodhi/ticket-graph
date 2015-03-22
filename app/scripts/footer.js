@@ -138,7 +138,6 @@ var graphMaker = function(priorities){
 
   stack(stackData);
 
-
   //Set up scales
   var xScale = d3.scale.ordinal()
     .domain(d3.range(stackData[0].length))
@@ -163,7 +162,7 @@ var graphMaker = function(priorities){
                   .attr('width', width)
                   .attr('height', height)
                   .append('g') //group the rects on the svg
-                  .attr('transform', 'translate(20, 0)');
+                  .attr('transform', 'translate(20, -5)');
   
   // Add a group for each row of data
   var groups = svg.selectAll("g")
@@ -183,7 +182,7 @@ var graphMaker = function(priorities){
       return xScale(i);
     })
     .attr("y", function(d) {
-      return yScale(d.y0);
+      return height - yScale(d.y0) - yScale(d.y);
     })
     .attr("height", function(d) {
       return yScale(d.y);
