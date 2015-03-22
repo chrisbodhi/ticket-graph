@@ -120,8 +120,8 @@ var readyTheTickets = function(tickets){
 
 // No need to return a promise if it's the last `then` in the chain
 // for testing locally
-// var graphMaker = function(priorities){
-var graphMaker = function(){
+var graphMaker = function(priorities){
+// var graphMaker = function(){
   console.log('graphMaker called');
   var stackData = priorities.map(function (d){
     return d.data.map(function (t, i){
@@ -212,14 +212,14 @@ var graphMaker = function(){
      .text(function(d){
        return d[0].y;    
      })
-     .attr('x', width / 2.667)
+     .attr('x', (width * 0.8) / 2) // Width of 'g' element
      .attr('y', function(d){ 
         var trialAndError = 35 + yScale(d[0].y0);
         console.log(trialAndError);
         return trialAndError; })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
-     .attr('fill', 'green');
+     .attr('fill', '#eeeeee');
 
 
   // Axis, no Allies
