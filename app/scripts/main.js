@@ -187,6 +187,11 @@ callSW().then(function(allTickets){
   var names = [29, 3, 2];        
   // var names = ['Alice', 'Bob', 'Carol'];        
 
+
+  // todo: implement this to get the names and stuff:
+  // card.services('environment').request('user', 2).then(function(data){console.log(data.first_name)})
+
+
   var yScale = d3.scale.ordinal()
           .domain(names)
           .rangeRoundBands([0, height], 0.1);
