@@ -219,7 +219,8 @@ var graphMaker = function(priorities){
         return trialAndError; })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
-     .attr('fill', '#eeeeee');
+     .attr('fill', '#eeeeee')
+     .classed('shadow', true);
 
 
   // Axis, no Allies

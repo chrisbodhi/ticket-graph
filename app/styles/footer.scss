@@ -69,12 +69,17 @@ body {
 .legend {
   font-size: 12px;
 }
+
 rect {
   cursor: pointer;
   stroke-width: 2;
   &.disabled {
     fill: transparent !important;
   }
+}
+
+.shadow {
+  text-shadow: 0px 2px 3px #555;
 }
 
 .axis path,
