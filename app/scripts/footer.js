@@ -26,6 +26,7 @@ var getTicketData = function(t){
 
 // Ticket priorities holder
 // for testing locally
+// ok that it's flipped in priority locally
 var priorities = [
   { priority: 'Low', 
     data: [{'count': 2 }]
@@ -126,6 +127,7 @@ var graphMaker = function(priorities){
     return d.data.map(function (t, i){
       return {
         x: 1,
+        priority: d.priority,
         y: t.count        
       };
     });
@@ -188,14 +190,13 @@ var graphMaker = function(priorities){
       return 'rgba(255, 102, 0, ' + (1 - ((d.y + d.y0) / 10)) + ')';
     })
     .on('mouseover', function (d) {
-      console.log(d);
       var xPos = parseFloat(d3.select(this).attr('x'));
       var yPos = parseFloat(d3.select(this).attr('y'));
       d3.select('#d3-tooltip')
           .style('left', (xPos + (width / 2)) + 'px')
           .style('top', (yPos + (height / 4)) + 'px')
           .select('#value')
-          .text(d.y);
+          .text(d.priority + ': ' + d.y);
       d3.select('#d3-tooltip').classed('hidden', false);
     })
     .on('mouseout', function () {
