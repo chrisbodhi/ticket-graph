@@ -77,7 +77,7 @@ rect {
     fill: transparent !important;
   }
 }
-
+// For the labels
 .shadow {
   text-shadow: 0px 2px 3px #555;
 }
@@ -85,7 +85,7 @@ rect {
 .axis path,
 .axis line {
   fill: none;
-  stroke: black;
+  stroke: #444444;
   shape-rendering: crispEdges;
 }
 
@@ -94,36 +94,30 @@ rect {
   font-size: 11px;
 }
 
-
-// x axis: '', 'translate(' + 5 + ',' + (height - 20) + ')')
-// y axis: 'transform', 'translate(' + 5 + ', 0)'
-
 /////////////////////////////////////////////////////////////////////////////// 
 // chart bizness end
 /////////////////////////////////////////////////////////////////////////////// 
 
+// /* Responsive: Portrait tablets and up */
+// @media screen and (min-width: 768px) {
+//   .container {
+//     max-width: 730px;
+//   }
 
+//   /* Remove the padding we set earlier */
+//   .header,
+//   .footer {
+//     padding-left: 0;
+//     padding-right: 0;
+//   }
 
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
+//   /* Space out the masthead */
+//   .header {
+//     margin-bottom: 30px;
+//   }
 
-  /* Remove the padding we set earlier */
-  .header,
-  .footer {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
-}
+//   /* Remove the bottom border on the jumbotron for visual effect */
+//   .jumbotron {
+//     border-bottom: 0;
+//   }
+// }

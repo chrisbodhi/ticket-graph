@@ -122,7 +122,6 @@ var readyTheTickets = function(tickets){
 // for testing locally
 var graphMaker = function(priorities){
 // var graphMaker = function(){
-  console.log('graphMaker called');
   var stackData = priorities.map(function (d){
     return d.data.map(function (t, i){
       return {
@@ -132,7 +131,7 @@ var graphMaker = function(priorities){
     });
   });
 
-  ///////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   // GRAPH MAKING
   var width = 200,
       height = 400;
@@ -154,7 +153,7 @@ var graphMaker = function(priorities){
         });
       })
     ])
-    .range([0, height]);
+    .range([height, 0]);
     
   //Create SVG element
   var svg = d3.select('.jumbotron')
@@ -162,7 +161,7 @@ var graphMaker = function(priorities){
                   .attr('width', width)
                   .attr('height', height)
                   .append('g') //group the rects on the svg
-                  .attr('transform', 'translate(20, -5)');
+                  .attr('transform', 'translate(20, 5)');
   
   // Add a group for each row of data
   var groups = svg.selectAll('g')
@@ -179,30 +178,31 @@ var graphMaker = function(priorities){
       return xScale(i);
     })
     .attr('y', function(d) {
-      return yScale(d.y0);
+      console.log('y ' + (yScale(0) - yScale(d.y0)));
+      return (yScale(0) - yScale(d.y0));
     })
     .attr('height', function(d) {
-      return yScale(d.y);
+      console.log('height ' + yScale(d.y));
+      return (yScale(0) - yScale(d.y));
     })
     .attr('width', width * 0.8)
     .attr('fill', function(d) {
-      console.log('Use ' + d.y0 + ' to determine which priority?');
       return 'rgba(255, 102, 0, ' + (1 - ((d.y + d.y0) / 10)) + ')';
     })
-    // .on('mouseover', function (d) {
-    //   console.log(d);
-    //   var xPos = parseFloat(d3.select(this).attr('x'));
-    //   var yPos = parseFloat(d3.select(this).attr('y'));
-    //   d3.select('#d3-tooltip')
-    //       .style('left', (xPos + (width / 2)) + 'px')
-    //       .style('top', (yPos + (height / 4)) + 'px')
-    //       .select('#value')
-    //       .text(d.y);
-    //   d3.select('#d3-tooltip').classed('hidden', false);
-    // })
-    // .on('mouseout', function () {
-    //   d3.select('#d3-tooltip').classed('hidden', true);
-    // });
+    .on('mouseover', function (d) {
+      console.log(d);
+      var xPos = parseFloat(d3.select(this).attr('x'));
+      var yPos = parseFloat(d3.select(this).attr('y'));
+      d3.select('#d3-tooltip')
+          .style('left', (xPos + (width / 2)) + 'px')
+          .style('top', (yPos + (height / 4)) + 'px')
+          .select('#value')
+          .text(d.y);
+      d3.select('#d3-tooltip').classed('hidden', false);
+    })
+    .on('mouseout', function () {
+      d3.select('#d3-tooltip').classed('hidden', true);
+    });
 
   // Add a label to each ticket block
   var labels = svg.selectAll('text')
@@ -214,14 +214,11 @@ var graphMaker = function(priorities){
      })
      .attr('x', (width * 0.8) / 2) // Width of 'g' element
      .attr('y', function(d){ 
-        var trialAndError = 35 + yScale(d[0].y0);
-        console.log(trialAndError);
-        return trialAndError; })
+        return 35 + yScale(d[0].y0); })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
      .attr('fill', '#eeeeee')
      .classed('shadow', true);
-
 
   // Axis, no Allies
   var yAxis = d3.svg.axis()
@@ -232,9 +229,6 @@ var graphMaker = function(priorities){
       .attr('class', 'axis')
       .call(yAxis); 
 };
-
-var logging = function(data){console.log('logged ' + data.length);};
-// .then(logging)
 
 // getUser()
 //   .then(getMyTickets)
