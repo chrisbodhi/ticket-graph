@@ -178,11 +178,9 @@ var graphMaker = function(priorities){
       return xScale(i);
     })
     .attr('y', function(d) {
-      console.log('y ' + (yScale(0) - yScale(d.y0)));
       return (yScale(0) - yScale(d.y0));
     })
     .attr('height', function(d) {
-      console.log('height ' + yScale(d.y));
       return (yScale(0) - yScale(d.y));
     })
     .attr('width', width * 0.8)
@@ -213,8 +211,8 @@ var graphMaker = function(priorities){
        return d[0].y;    
      })
      .attr('x', (width * 0.8) / 2) // Width of 'g' element
-     .attr('y', function(d){ 
-        return 35 + yScale(d[0].y0); })
+     .attr('y', function(d){
+        return 30 + yScale(0) - yScale(d[0].y0); })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
      .attr('fill', '#eeeeee')
