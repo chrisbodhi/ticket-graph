@@ -3,7 +3,7 @@ node_modules
 bower_components
 
 # Things that are compiled
-dist
+# dist # commit this because Heroku needs it to deploy
 .tmp
 .sass-cache
 
