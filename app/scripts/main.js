@@ -29,30 +29,9 @@ var callSW = function(){
 // Get the tickets we want to chart
 callSW().then(function(allTickets){
   ticketsToChart = allTickets.filter(function(ticket, index, arr){
-    if (ticket.status === 'open' && ticket.assignee) { return ticket; }
+    if (ticket.status !== 'open') { return ticket; }
   });
-  ////////////////////////////////
-  // Get an array of the assignees
-  assigneeIds = ticketsToChart.map(function(ticket, index, arr){
-    return ticket.assignee.id;
-  });
-  // http://stackoverflow.com/a/9229821/2276791
-  var uniqIds = function(a) {
-    var seen  = {},
-        out   = [],
-        len   = a.length,
-        j     = 0;
-    for(var i = 0; i < len; i++) {
-      var item = a[i];
-      if(seen[item] !== 1) {
-        seen[item] = 1;
-        out[j++] = item;
-      }
-    }
-    return out;
-  };
-  assigneeIds = uniqIds(assigneeIds);
-
+  
   // Calculate the days a ticket has been open
   var calcDaysOpen = function(time){
     var floatDays = (Date.now() - new Date(time))/(1000*60*60*24);
@@ -69,41 +48,18 @@ callSW().then(function(allTickets){
     return info;
   };
 
-  // Used for splitting out each assignee's tickets...
-  var theirTickets = function(assigneeId){
-    return ticketsToChart.filter(function(t, index, arr){
-      if (assigneeId === t.assignee.id){
-        return t;
-      } 
-    });
-  };
-  // ...done here.
-  assigneeIds.forEach(function(a){
-    var bucket = { 
-                  'assigneeId': a,
-                  'assigneeName': '', 
-                  'tickets': [] 
-                };
-    var theseTickets = theirTickets(a);
-    theseTickets.forEach(function(t){
-      bucket.tickets.push(getTicketData(t));
-    });
-    dataArray.push(bucket);
-    bucket = {};
-  });
-
   // Prioritizing the tickets
   var priorities = []; // PRIORITIES!
 
   priorities.push(
     { priority: 'Low', 
-      data: []
+      count: 0
     },
     { priority: 'Medium', 
-      data: []
+      count: 0
     },
     { priority: 'High', 
-      data: []}
+      count: 0}
     );
 
   var getCount = function (data, priorityInt) {
@@ -112,28 +68,19 @@ callSW().then(function(allTickets){
     }).length;
   };
 
-  var assignPriorities = function(d, lowCount, medCount, highCount){
+  var priorityCount = function(d, lowCount, medCount, highCount){
     priorities.forEach(function(p){
       if (p.priority === 'Low'){
-        p.data.push({'assId': d.assigneeId, 'count': lowCount });
+        p.count = getCount(d, 3);
       } else if (p.priority === 'Medium'){
-        p.data.push({'assId': d.assigneeId, 'count': medCount });
+        p.count = getCount(d, 2);
       } else if (p.priority === 'High'){
-        p.data.push({'assId': d.assigneeId, 'count': highCount });
+        p.count = getCount(d, 1);
       } else {
         console.error('No priority noted for ticket ' + d);
       }
     });
   };
-
-  // Prepare the data for processing by D3, here...
-  dataArray.forEach(function(d){
-    var lowCount = getCount(d, 1),
-        medCount = getCount(d, 2),
-        highCount = getCount(d, 3);
-    
-    assignPriorities(d, lowCount, medCount, highCount);
-  });
 
   console.log(priorities);
   
@@ -265,3 +212,8 @@ callSW().then(function(allTickets){
       .attr('class', 'axis')
       .call(yAxis); 
 });
+
+// get unassigned tickets
+// then use return value to fill priority counts
+// then use return counts to chart
+
