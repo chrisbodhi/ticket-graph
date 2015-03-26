@@ -25,6 +25,32 @@ var callSW = function(){
   return promise;
 };
 
+var getOpenTickets = function(){
+  var promise = new RSVP.Promise(function(resolve, reject){
+    var card = new SW.Card();
+    card.services('helpdesk').request('tickets', { status: 'open' })
+        .then(function(data){
+          if (data.tickets.length > 0){
+            resolve(data.tickets);
+          } else {
+            reject('err');
+          }
+        });
+  });
+  return promise;
+};
+
+var getUnassigned = function(openTickets){
+  var promise = new RSVP.Promise(function(resolve, reject){
+    resolve(openTickets.filter(function(t,index,arr){
+      if (!t.assignee){ return t; }
+    }));
+  });
+  return promise;
+};
+
+var unass = getOpenTickets().then(getUnassigned);
+
 ////////////////////////////////////
 // Get the tickets we want to chart
 callSW().then(function(allTickets){
@@ -216,4 +242,5 @@ callSW().then(function(allTickets){
 // get unassigned tickets
 // then use return value to fill priority counts
 // then use return counts to chart
+// bar charts of unassigned tickets, stacked based on time open
 
