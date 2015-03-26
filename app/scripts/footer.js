@@ -27,28 +27,28 @@ var getTicketData = function(t){
 // Ticket priorities holder
 // for testing locally
 // ok that it's flipped in priority locally
-var priorities = [
-  { priority: 'High', 
-    data: [{'count': 1 }]
-  },
-  { priority: 'Medium', 
-    data: [{'count': 4 }]
-  },
-  { priority: 'Low', 
-    data: [{'count': 2 }]
-  }
-];
 // var priorities = [
 //   { priority: 'High', 
-//     data: []
+//     data: [{'count': 1 }]
 //   },
 //   { priority: 'Medium', 
-//     data: []
+//     data: [{'count': 4 }]
 //   },
 //   { priority: 'Low', 
-//     data: []
+//     data: [{'count': 2 }]
 //   }
 // ];
+var priorities = [
+  { priority: 'High', 
+    data: []
+  },
+  { priority: 'Medium', 
+    data: []
+  },
+  { priority: 'Low', 
+    data: []
+  }
+];
 
 var getCount = function (data, priorityInt) {
   return data.filter(function(t,index,arr) {
@@ -122,8 +122,8 @@ var readyTheTickets = function(tickets){
 
 // No need to return a promise if it's the last `then` in the chain
 // for testing locally
-var graphMaker = function(priorities){
-// var graphMaker = function(){
+// var graphMaker = function(priorities){
+var graphMaker = function(){
   var stackData = priorities.map(function (d){
     return d.data.map(function (t, i){
       return {
@@ -231,11 +231,11 @@ var graphMaker = function(priorities){
       .call(yAxis); 
 };
 
-// getUser()
-//   .then(getMyTickets)
-//   .then(readyTheTickets)
-//   .then(graphMaker);
+getUser()
+  .then(getMyTickets)
+  .then(readyTheTickets)
+  .then(graphMaker);
 
 // for testing locally
-graphMaker(priorities);
+// graphMaker(priorities);
 
