@@ -27,27 +27,28 @@ var getTicketData = function(t){
 // Ticket priorities holder
 // for testing locally
 // ok that it's flipped in priority locally
-// var priorities = [
-//   { priority: 'Low', 
-//     data: [{'count': 2 }]
-//   },
-//   { priority: 'Medium', 
-//     data: [{'count': 4 }]
-//   },
-//   { priority: 'High', 
-//     data: [{'count': 1 }]
-//   }
-// ];
 var priorities = [
-  { priority: 'Low', 
-    data: []
+  { priority: 'High', 
+    data: [{'count': 1 }]
   },
   { priority: 'Medium', 
-    data: []
+    data: [{'count': 4 }]
   },
-  { priority: 'High', 
-    data: []}
+  { priority: 'Low', 
+    data: [{'count': 2 }]
+  }
 ];
+// var priorities = [
+//   { priority: 'High', 
+//     data: []
+//   },
+//   { priority: 'Medium', 
+//     data: []
+//   },
+//   { priority: 'Low', 
+//     data: []
+//   }
+// ];
 
 var getCount = function (data, priorityInt) {
   return data.filter(function(t,index,arr) {
@@ -121,8 +122,8 @@ var readyTheTickets = function(tickets){
 
 // No need to return a promise if it's the last `then` in the chain
 // for testing locally
-// var graphMaker = function(priorities){
-var graphMaker = function(){
+var graphMaker = function(priorities){
+// var graphMaker = function(){
   var stackData = priorities.map(function (d){
     return d.data.map(function (t, i){
       return {
@@ -180,14 +181,14 @@ var graphMaker = function(){
       return xScale(i);
     })
     .attr('y', function(d) {
-      return  yScale(d.y0);
+      return 400 - yScale(d.y0);
     })
     .attr('height', function(d) {
-      return  yScale(d.y);
+      return 400 - yScale(d.y);
     })
     .attr('width', width * 0.8)
     .attr('fill', function(d) {
-      return 'rgba(255, 102, 0, ' + ((d.y + d.y0) / 10) + ')';
+      return 'rgba(255, 102, 0, ' + (1 - ((d.y + d.y0) / 10)) + ')';
     })
     .on('mouseover', function (d) {
       var xPos = parseFloat(d3.select(this).attr('x'));
@@ -213,7 +214,8 @@ var graphMaker = function(){
      })
      .attr('x', (width * 0.8) / 2) // Width of 'g' element
      .attr('y', function(d){
-        return 30 + yScale(0) - yScale(d[0].y0); })
+        console.log(430-yScale(d[0].y0));
+        return 430-yScale(d[0].y0) })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
      .attr('fill', '#eeeeee')
@@ -229,11 +231,11 @@ var graphMaker = function(){
       .call(yAxis); 
 };
 
-getUser()
-  .then(getMyTickets)
-  .then(readyTheTickets)
-  .then(graphMaker);
+// getUser()
+//   .then(getMyTickets)
+//   .then(readyTheTickets)
+//   .then(graphMaker);
 
 // for testing locally
-// graphMaker(priorities);
+graphMaker(priorities);
 
