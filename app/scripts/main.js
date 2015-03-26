@@ -129,16 +129,16 @@ var graphMaker = function(){
         .attr("height", h);
 
   svg.selectAll("rect")
-     .data(dataset)
+     .data(counts)
      .enter()
      .append("rect")
      .attr("x", function(d, i) {
-        return i * (w / dataset.length);
+        return i * (w / counts.length);
      })
      .attr("y", function(d) {
         return h - (d * 4);
      })
-     .attr("width", w / dataset.length - barPadding)
+     .attr("width", w / counts.length - barPadding)
      .attr("height", function(d) {
         return d * 4;
      })
@@ -147,7 +147,7 @@ var graphMaker = function(){
      });
 
   svg.selectAll("text")
-     .data(dataset)
+     .data(counts)
      .enter()
      .append("text")
      .text(function(d) {
@@ -155,7 +155,7 @@ var graphMaker = function(){
      })
      .attr("text-anchor", "middle")
      .attr("x", function(d, i) {
-        return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
+        return i * (w / counts.length) + (w / counts.length - barPadding) / 2;
      })
      .attr("y", function(d) {
         return h - (d * 4) + 14;
