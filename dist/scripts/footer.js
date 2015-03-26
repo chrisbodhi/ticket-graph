@@ -187,7 +187,7 @@ var graphMaker = function(){
     })
     .attr('width', width * 0.8)
     .attr('fill', function(d) {
-      return 'rgba(255, 102, 0, ' + (1 - ((d.y + d.y0) / 10)) + ')';
+      return 'rgba(255, 102, 0, ' + ((d.y + d.y0) / 10) + ')';
     })
     .on('mouseover', function (d) {
       var xPos = parseFloat(d3.select(this).attr('x'));
