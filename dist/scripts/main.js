@@ -115,9 +115,9 @@ var countTickets = function(ticketData){
 // GRAPH MAKING
 var graphMaker = function(){
   //Width and height
-  var w = 500;
-  var h = 100;
-  var barPadding = 1;
+  var width = 500;
+  var height = 100;
+  var barPadding = 10;
 
   var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
           11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
@@ -125,25 +125,39 @@ var graphMaker = function(){
   //Create SVG element
   var svg = d3.select(".jumbotron")
         .append("svg")
-        .attr("width", w)
-        .attr("height", h);
+        .attr("width", width)
+        .attr("height", height);
 
   svg.selectAll("rect")
      .data(counts)
      .enter()
      .append("rect")
      .attr("x", function(d, i) {
-        return i * (w / counts.length);
+        return i * (width / counts.length);
      })
      .attr("y", function(d) {
-        return h - (d * 4);
+        return height - (d * 20);
      })
-     .attr("width", w / counts.length - barPadding)
+     .attr("width", width / counts.length - barPadding)
      .attr("height", function(d) {
-        return d * 4;
+        return d * 20;
      })
-     .attr("fill", function(d) {
-      return "rgb(0, 0, " + (d * 10) + ")";
+     .attr("fill", function(d, i) {
+      console.log(1 - (i * 0.4));
+      return "rgba(255, 102, 0, " + (1 - (i * 0.4)) + ")";
+     })
+     .on('mouseover', function (d) {
+       var xPos = parseFloat(d3.select(this).attr('x'));
+       var yPos = parseFloat(d3.select(this).attr('y'));
+       d3.select('#d3-tooltip')
+           .style('left', (xPos + (width * 1.5)) + 'px')
+           .style('top', (yPos + (height)) + 'px')
+           .select('#value')
+           .text(d);
+       d3.select('#d3-tooltip').classed('hidden', false);
+     })
+     .on('mouseout', function () {
+       d3.select('#d3-tooltip').classed('hidden', true);
      });
 
   svg.selectAll("text")
@@ -155,10 +169,10 @@ var graphMaker = function(){
      })
      .attr("text-anchor", "middle")
      .attr("x", function(d, i) {
-        return i * (w / counts.length) + (w / counts.length - barPadding) / 2;
+        return i * (width / counts.length) + (width / counts.length - barPadding) / 2;
      })
      .attr("y", function(d) {
-        return h - (d * 4) + 14;
+        return height - (d * 20) + 14;
      })
      .attr("font-family", "sans-serif")
      .attr("font-size", "11px")
@@ -168,11 +182,14 @@ var graphMaker = function(){
 
 // use function(d,i){ // use i to change the fill/`a` in rgba value color }
 
-getOpenTickets()
-  .then(getUnassigned)
-  .then(studyTheTickets)
-  .then(countTickets)
-  .then(graphMaker);
+// getOpenTickets()
+//   .then(getUnassigned)
+//   .then(studyTheTickets)
+//   .then(countTickets)
+//   .then(graphMaker);
+
+counts = [4,1,5];
+graphMaker();
 
 // get unassigned tickets
 // then use return value to fill priority counts
