@@ -27,27 +27,27 @@ var getTicketData = function(t){
 // Ticket priorities holder
 // for testing locally
 // ok that it's flipped in priority locally
-var priorities = [
-  { priority: 'Low', 
-    data: [{'count': 2 }]
-  },
-  { priority: 'Medium', 
-    data: [{'count': 4 }]
-  },
-  { priority: 'High', 
-    data: [{'count': 1 }]
-  }
-];
 // var priorities = [
 //   { priority: 'Low', 
-//     data: []
+//     data: [{'count': 2 }]
 //   },
 //   { priority: 'Medium', 
-//     data: []
+//     data: [{'count': 4 }]
 //   },
 //   { priority: 'High', 
-//     data: []}
+//     data: [{'count': 1 }]
+//   }
 // ];
+var priorities = [
+  { priority: 'Low', 
+    data: []
+  },
+  { priority: 'Medium', 
+    data: []
+  },
+  { priority: 'High', 
+    data: []}
+];
 
 var getCount = function (data, priorityInt) {
   return data.filter(function(t,index,arr) {
