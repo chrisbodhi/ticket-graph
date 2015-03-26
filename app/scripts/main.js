@@ -179,20 +179,12 @@ var graphMaker = function(){
      .attr("fill", "white");
 };
 
+getOpenTickets()
+  .then(getUnassigned)
+  .then(studyTheTickets)
+  .then(countTickets)
+  .then(graphMaker);
 
-// use function(d,i){ // use i to change the fill/`a` in rgba value color }
-
-// getOpenTickets()
-//   .then(getUnassigned)
-//   .then(studyTheTickets)
-//   .then(countTickets)
-//   .then(graphMaker);
-
-counts = [4,1,5];
-graphMaker();
-
-// get unassigned tickets
-// then use return value to fill priority counts
-// then use return counts to chart
-// bar charts of unassigned tickets, stacked based on time open
-
+// For testing
+// counts = [4,1,5];
+// graphMaker();
