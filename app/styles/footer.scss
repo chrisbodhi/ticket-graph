@@ -1,5 +1,10 @@
+$icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
+// bower:scss
+@import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
+// endbower
+
 /* Space out content a bit */
-#footer-body {
+.jumbotron {
   padding-top: 10px;
   padding-bottom: 10px;
   background-color: #444444;

@@ -158,7 +158,7 @@ var graphMaker = function(){
     .range([height, 0]);
     
   //Create SVG element
-  var svg = d3.select('#footer-graph')
+  var svg = d3.select('.jumbotron')
                   .append('svg')
                   .attr('width', width)
                   .attr('height', height)
