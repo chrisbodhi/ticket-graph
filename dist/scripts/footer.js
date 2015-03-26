@@ -105,9 +105,9 @@ var readyTheTickets = function(tickets){
       dataArray.push(getTicketData(t));
     });
     // Prepare the data for processing by D3
-    var lowCount  = getCount(dataArray, 1),
+    var lowCount  = getCount(dataArray, 3),
         medCount  = getCount(dataArray, 2),
-        highCount = getCount(dataArray, 3);    
+        highCount = getCount(dataArray, 1);    
     assignPriorities(lowCount, medCount, highCount);
     console.log(priorities);
     if (priorities){
