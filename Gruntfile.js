@@ -139,15 +139,15 @@ module.exports = function (grunt) {
       ]
     },
 
-    // Mocha testing framework configuration options
-    mocha: {
-      all: {
-        options: {
-          run: true,
-          urls: ['http://<%= connect.test.options.hostname %>:<%= connect.test.options.port %>/index.html']
-        }
-      }
-    },
+    // concat: {
+    //   options: {
+    //     separator: ';',
+    //   },
+    //   dist: {
+    //     src: ['<%= config.app %>/scripts/**/*.js'],
+    //     dest: '<%= config.dist %>/scripts/thangs.js'
+    //   },
+    // },
 
     // Compiles Sass to CSS and generates necessary files if requested
     sass: {
@@ -204,19 +204,19 @@ module.exports = function (grunt) {
     },
 
     // Renames files for browser caching purposes
-    rev: {
-      dist: {
-        files: {
-          src: [
-            '<%= config.dist %>/scripts/{,*/}*.js',
-            '<%= config.dist %>/styles/{,*/}*.css',
-            '<%= config.dist %>/images/{,*/}*.*',
-            '<%= config.dist %>/styles/fonts/{,*/}*.*',
-            '<%= config.dist %>/*.{ico,png}'
-          ]
-        }
-      }
-    },
+    // rev: {
+    //   dist: {
+    //     files: {
+    //       src: [
+    //         '<%= config.dist %>/scripts/{,*/}*.js',
+    //         '<%= config.dist %>/styles/{,*/}*.css',
+    //         '<%= config.dist %>/images/{,*/}*.*',
+    //         '<%= config.dist %>/styles/fonts/{,*/}*.*',
+    //         '<%= config.dist %>/*.{ico,png}'
+    //       ]
+    //     }
+    //   }
+    // },
 
     // Reads HTML for usemin blocks to enable smart builds that automatically
     // concat, minify and revision files. Creates configurations in memory so
@@ -431,7 +431,7 @@ module.exports = function (grunt) {
     'uglify',
     'copy:dist',
     'modernizr',
-    'rev',
+    // 'rev',
     'usemin',
     'htmlmin'
   ]);

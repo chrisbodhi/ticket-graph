@@ -37,7 +37,7 @@ body {
 }
 
 /* Custom page footer */
-.footer {
+.main-footer {
   padding-top: 19px;
   color: #777;
   border-top: 1px solid #e5e5e5;
@@ -48,7 +48,7 @@ body {
 }
 
 /* Gray thang */
-.jumbotron {
+.jumbotron, .jumbotron-footer {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
   h1 {
@@ -119,9 +119,56 @@ rect {
   font-size: 11px;
 }
 
+/* Space out content a bit */
+#footer-body {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #444444;
+}
 
-// x axis: '', 'translate(' + 5 + ',' + (height - 20) + ')')
-// y axis: 'transform', 'translate(' + 5 + ', 0)'
+/////////////////////////////////////////////////////////////////////////////// 
+// Graph-chart bizness start
+/////////////////////////////////////////////////////////////////////////////// 
+#d3-footer-tooltip {
+    position: absolute;
+    text-align: center;
+    height: auto;
+    padding: 10px;
+    background-color: white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+}
+#d3-footer-tooltip.hidden {
+    display: none;
+}
+#d3-footer-tooltip p {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+// For the labels
+.shadow {
+  text-shadow: 0px 2px 3px #555;
+}
+
+.footer-axis path,
+.footer-axis line {
+  fill: none;
+  stroke: #444444;
+  shape-rendering: crispEdges;
+}
+
+.footer-axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
 
 /////////////////////////////////////////////////////////////////////////////// 
 // chart bizness end

@@ -1,47 +1,14 @@
-$icon-font-path: "../bower_components/bootstrap-sass-official/assets/fonts/bootstrap/";
-// bower:scss
-@import "bootstrap-sass-official/assets/stylesheets/_bootstrap.scss";
-// endbower
-
-.browsehappy {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
-}
-
 /* Space out content a bit */
-body {
+#footer-body {
   padding-top: 10px;
   padding-bottom: 10px;
   background-color: #444444;
 }
 
-/* Gray thang */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-  h1 {
-    font-size: 22px;
-    text-align: center;
-  }
-  .btn {
-    font-size: 21px;
-    padding: 14px 24px;
-  }
-}
-
 /////////////////////////////////////////////////////////////////////////////// 
 // Graph-chart bizness start
 /////////////////////////////////////////////////////////////////////////////// 
-#chart {                                                          
-  height: 360px;
-  margin: 0 auto;                                                  
-  position: relative;                                             
-  width: 360px;                                                   
-}
-
-#d3-tooltip {
+#d3-footer-tooltip {
     position: absolute;
     text-align: center;
     height: auto;
@@ -55,40 +22,29 @@ body {
     box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
     pointer-events: none;
 }
-#d3-tooltip.hidden {
+#d3-footer-tooltip.hidden {
     display: none;
 }
-#d3-tooltip p {
+#d3-footer-tooltip p {
     margin: 0;
     font-family: sans-serif;
     font-size: 16px;
     line-height: 20px;
 }
 
-.legend {
-  font-size: 12px;
-}
-
-rect {
-  cursor: pointer;
-  stroke-width: 2;
-  &.disabled {
-    fill: transparent !important;
-  }
-}
 // For the labels
 .shadow {
   text-shadow: 0px 2px 3px #555;
 }
 
-.axis path,
-.axis line {
+.footer-axis path,
+.footer-axis line {
   fill: none;
   stroke: #444444;
   shape-rendering: crispEdges;
 }
 
-.axis text {
+.footer-axis text {
   font-family: sans-serif;
   font-size: 11px;
 }
@@ -96,7 +52,7 @@ rect {
 /////////////////////////////////////////////////////////////////////////////// 
 // chart bizness end
 /////////////////////////////////////////////////////////////////////////////// 
-
+// todo: Delete this after testing in the SW footer, if not needed
 // /* Responsive: Portrait tablets and up */
 // @media screen and (min-width: 768px) {
 //   .container {
