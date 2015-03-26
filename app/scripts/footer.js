@@ -58,12 +58,12 @@ var getCount = function (data, priorityInt) {
 
 var assignPriorities = function(lowCount, medCount, highCount){
   priorities.forEach(function(p){
-    if (p.priority === 'Low'){
-      p.data.push({'count': lowCount });
+    if (p.priority === 'High'){
+      p.data.push({'count': highCount });
     } else if (p.priority === 'Medium'){
       p.data.push({'count': medCount });
-    } else if (p.priority === 'High'){
-      p.data.push({'count': highCount });
+    } else if (p.priority === 'Low'){
+      p.data.push({'count': lowCount });
     } else {
       console.error('No priority noted for ticket.');
     }
