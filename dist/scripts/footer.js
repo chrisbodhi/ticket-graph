@@ -180,10 +180,10 @@ var graphMaker = function(){
       return xScale(i);
     })
     .attr('y', function(d) {
-      return (yScale(0) - yScale(d.y0));
+      return  yScale(d.y0);
     })
     .attr('height', function(d) {
-      return (yScale(0) - yScale(d.y));
+      return  yScale(d.y);
     })
     .attr('width', width * 0.8)
     .attr('fill', function(d) {
