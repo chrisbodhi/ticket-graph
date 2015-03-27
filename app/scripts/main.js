@@ -130,8 +130,8 @@ var graphMaker = function(){
        var xPos = parseFloat(d3.select(this).attr('x'));
        var yPos = parseFloat(d3.select(this).attr('y'));
        d3.select('#d3-tooltip')
-           .style('left', (xPos + (width * 1.5)) + 'px')
-           .style('top', (yPos + (height)) + 'px')
+           .style('left', xPos + 'px')
+           .style('top', ((yPos + height) + 'px')
            .select('#value')
            .text(function() {
               return addLabel(i) + ': ' + d;
