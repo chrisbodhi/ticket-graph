@@ -110,7 +110,6 @@ var readyTheTickets = function(tickets){
         medCount  = getCount(dataArray, 2),
         highCount = getCount(dataArray, 1);    
     assignPriorities(lowCount, medCount, highCount);
-    console.log(priorities);
     if (priorities){
       resolve(priorities);
     } else {
