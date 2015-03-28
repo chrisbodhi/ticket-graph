@@ -91,7 +91,7 @@ var countTickets = function(ticketData){
 };
 
 var addLabel = function(i){
-  var priorities = {0: "High", 1: "Medium", 2: "Low"};
+  var priorities = {0: 'High', 1: 'Medium', 2: 'Low'};
   return priorities[i];
 };
 
@@ -104,61 +104,61 @@ var graphMaker = function(){
   var barPadding = 10;
 
   //Create SVG element
-  var svg = d3.select(".jumbotron")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+  var svg = d3.select('.jumbotron')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
 
-  svg.selectAll("rect")
+  svg.selectAll('rect')
      .data(counts)
      .enter()
-     .append("rect")
-     .attr("x", function(d, i) {
+     .append('rect')
+     .attr('x', function(d, i) {
         return i * (width / counts.length);
      })
-     .attr("y", function(d) {
+     .attr('y', function(d) {
         return height - (d * 20);
      })
-     .attr("width", width / counts.length - barPadding)
-     .attr("height", function(d) {
+     .attr('width', width / counts.length - barPadding)
+     .attr('height', function(d) {
         return d * 20;
      })
-     .attr("fill", function(d, i) {
-      return "rgba(255, 102, 0, " + (1 - (i * 0.4)) + ")";
+     .attr('fill', function(d, i) {
+      return 'rgba(255, 102, 0, ' + (1 - (i * 0.4)) + ')';
      })
      .on('mouseover', function (d, i) {
        var xPos = parseFloat(d3.select(this).attr('x'));
        var yPos = parseFloat(d3.select(this).attr('y'));
        d3.select('#d3-tooltip')
-           .style('left', (xPos + (width / counts.length - barPadding)) + 'px') // 425px
+           .style('left', (xPos + (width / counts.length - barPadding)) + 'px')
            .style('top', ((yPos + height) + 'px'))
            .select('#value')
            .text(function() {
               return addLabel(i) + ': ' + d;
-            })
+            });
        d3.select('#d3-tooltip').classed('hidden', false);
      })
      .on('mouseout', function () {
        d3.select('#d3-tooltip').classed('hidden', true);
      });
 
-  svg.selectAll("text")
+  svg.selectAll('text')
      .data(counts)
      .enter()
-     .append("text")
+     .append('text')
      .text(function(d) {
         return d;
      })
-     .attr("text-anchor", "middle")
-     .attr("x", function(d, i) {
+     .attr('text-anchor', 'middle')
+     .attr('x', function(d, i) {
         return i * (width / counts.length) + (width / counts.length - barPadding) / 2;
      })
-     .attr("y", function(d) {
+     .attr('y', function(d) {
         return height - (d * 20) + 14;
      })
-     .attr("font-family", "sans-serif")
-     .attr("font-size", "13px")
-     .attr("fill", "white");
+     .attr('font-family', 'sans-serif')
+     .attr('font-size', '13px')
+     .attr('fill', 'white');
 };
 
 getOpenTickets()

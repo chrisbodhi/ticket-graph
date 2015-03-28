@@ -5,8 +5,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // START TICKET FILTERING
-var dataArray       = [], // this will be passed to D3
-    ticketsToChart  = [];
+var dataArray = []; // this will be passed to D3
 
 // Calculate the days a ticket has been open
 var calcDaysOpen = function(time){
