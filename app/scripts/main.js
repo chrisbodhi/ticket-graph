@@ -129,13 +129,14 @@ var graphMaker = function(){
      .on('mouseover', function (d, i) {
        var xPos = parseFloat(d3.select(this).attr('x'));
        var yPos = parseFloat(d3.select(this).attr('y'));
+       console.log(xPos + (width / counts.length - barPadding));
        d3.select('#d3-tooltip')
-           .style('left', xPos + 'px')
-           .style('top', ((yPos + height) + 'px')
+           .style('left', (xPos + (width / counts.length - barPadding)) + 'px') // 425px
+           .style('top', ((yPos + height) + 'px'))
            .select('#value')
            .text(function() {
               return addLabel(i) + ': ' + d;
-            });
+            })
        d3.select('#d3-tooltip').classed('hidden', false);
      })
      .on('mouseout', function () {
@@ -161,12 +162,12 @@ var graphMaker = function(){
      .attr("fill", "white");
 };
 
-getOpenTickets()
-  .then(getUnassigned)
-  .then(studyTheTickets)
-  .then(countTickets)
-  .then(graphMaker);
+// getOpenTickets()
+//   .then(getUnassigned)
+//   .then(studyTheTickets)
+//   .then(countTickets)
+//   .then(graphMaker);
 
 // For testing
-// counts = [4,1,5];
-// graphMaker();
+counts = [4,1,5];
+graphMaker();

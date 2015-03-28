@@ -214,8 +214,7 @@ var graphMaker = function(){
      })
      .attr('x', (width * 0.8) / 2) // Width of 'g' element
      .attr('y', function(d){
-        console.log(430-yScale(d[0].y0));
-        return 430-yScale(d[0].y0) })
+        return 430-yScale(d[0].y0); })
      .attr('font-family', 'sans-serif')
      .attr('font-size', '21px')
      .attr('fill', '#eeeeee')
