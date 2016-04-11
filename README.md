@@ -1,15 +1,13 @@
 #Ticket Tracker
 ##Plugin for the Spiceworks App Center
 
-![screenshot of the graphs that make up the app]()
-
 ###Install
-Install through the [Spiceworks App Center]()
+Install through the [Spiceworks App Center](https://www.spiceworks.com/appcenter/)
 
 ###Contributing
 Sure!
 
-####Main Tech &amp; Tools
+###Main Tech &amp; Tools
 
 - D3.js
 - Yeoman generator
@@ -20,5 +18,5 @@ Sure!
 - Grunt
 - Bower
 
-####[On Heroku](https://obscure-mountain-1975.herokuapp.com/)
+###[On Heroku](https://obscure-mountain-1975.herokuapp.com/)
 
